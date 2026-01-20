@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Lý Kho Giấy 2.0</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Roboto', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            'accent-1': '#ff3b3b',
+            'accent-2': '#e60000',
+            'green-neon': '#00ff66',
+            'yellow-neon': '#FF8C00',
+            'danger': '#ff4444',
+            'dark-glass': '#0f0f0f',
+            'red-glass': '#2a0505',
+          },
+          transitionProperty: {
+            'width': 'width',
+            'spacing': 'margin, padding',
+          },
+          screens: {
+            'print': {'raw': 'print'},
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #000000;
+      overflow: hidden; 
+    }
+    
+    /* Background Gradient - Balanced 40% Red / 60% Black */
+    .bg-app {
+      background-color: #000000;
+      /* Radial gradient: Deep Ruby Red spreading from center-top (approx 40%) into Deep Black (60%) */
+      background: radial-gradient(circle at 50% 30%, #6e0000 0%, #4a0000 30%, #1a0000 60%, #000000 100%);
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+    }
+    
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      /* Slight texture/noise overlay or vignette to blend the red/black smoother */
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+      pointer-events: none;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+      border: 1px solid #0a0a0a;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* PRINT STYLES */
+    @media print {
+      body, html {
+        overflow: visible !important;
+        height: auto !important;
+        background: white !important;
+      }
+      #root, .bg-overlay, .bg-app {
+        display: none !important;
+      }
+      #print-area {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        background: white;
+        z-index: 9999;
+      }
+      .page-break {
+        page-break-after: always;
+        break-after: page;
+      }
+      @page {
+        margin: 0;
+      }
+    }
+    #print-area {
+      display: none;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0?dev",
+    "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime?dev",
+    "react-dom": "https://esm.sh/react-dom@19.0.0?dev",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client?dev",
+    "react-qr-code": "https://esm.sh/react-qr-code@2.0.15?external=react",
+    "react-window": "https://esm.sh/react-window@1.8.10?external=react,react-dom",
+    "idb-keyval": "https://esm.sh/idb-keyval@6.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body class="bg-app text-white h-screen flex relative">
+  <div class="bg-overlay"></div>
+  <div id="root" class="w-full h-full flex"></div>
+  <!-- Print Area Container -->
+  <div id="print-area"></div>
+</body>
+</html>
