@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { InventoryData, UserInfo } from '../types';
 import { formatNumberVN } from '../utils/formatters';
 import PrintLabelModal from './PrintLabelModal';
 import { useToast } from './ToastContext';
-import * as ReactWindow from 'react-window';
+import { FixedSizeList } from 'react-window';
+import { useInventoryLogic } from '../hooks/useInventoryLogic';
 
 interface InventoryTableProps {
   data: InventoryData | null;
@@ -14,19 +15,27 @@ interface InventoryTableProps {
 }
 
 const ROW_HEIGHT = 48;
-
-const COL_IDX_SKU = 0;
-const COL_IDX_WEIGHT = 11;
 const QUANTITY_COL_IDX = 12;
-const PENDING_COL_IDX = 16;
 
 const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpdateRow, userInfo }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [searchColIndex, setSearchColIndex] = useState<string>('all');
-  const [filterSmallLots, setFilterSmallLots] = useState(false);
-  const [filterPendingExport, setFilterPendingExport] = useState(false);
-  const [sortConfig, setSortConfig] = useState<{ key: number; direction: 'asc' | 'desc' } | null>(null);
+  const headers: string[] = (data && data.length > 0) ? (data[0] as string[]) : [];
+
+  // Use Custom Hook for Logic
+  const {
+    inputValue,
+    handleSearchChange,
+    searchColIndex,
+    setSearchColIndex,
+    filterSmallLots,
+    setFilterSmallLots,
+    filterPendingExport,
+    setFilterPendingExport,
+    sortConfig,
+    setSortConfig,
+    processedRows,
+    totalWeight,
+    isPendingSearch
+  } = useInventoryLogic(data, headers);
 
   // Use a resize observer or wrapper to get dimensions for FixedSizeList
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,15 +51,6 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
   const [lastSelectedRow, setLastSelectedRow] = useState<number | null>(null); // For Shift+Click
 
   const { showToast } = useToast();
-
-  const headers: string[] = (data && data.length > 0) ? (data[0] as string[]) : [];
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchTerm(inputValue);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [inputValue]);
 
   useEffect(() => {
     if (selectedRowIndex !== null && data) {
@@ -134,100 +134,6 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
     });
   }, [data, headers]);
 
-  const processedRows = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
-    const originalRows = data.slice(1);
-    const indexedRows = originalRows.map((row, idx) => ({ row, originalIndex: idx + 1 }));
-    let rows = indexedRows;
-
-    if (debouncedSearchTerm.trim()) {
-      const lowerTerm = debouncedSearchTerm.toLowerCase();
-      const keywords = lowerTerm.split(';').map(k => k.trim()).filter(k => k.length > 0);
-      if (keywords.length > 0) {
-        rows = rows.filter(({ row }) => {
-          if (searchColIndex === 'all') {
-            return keywords.every(keyword => row.some((cell: any) => String(cell).toLowerCase().includes(keyword)));
-          } else {
-            const colIdx = parseInt(searchColIndex, 10);
-            return keywords.every(keyword => String((row as any[])[colIdx]).toLowerCase().includes(keyword));
-          }
-        });
-      }
-    }
-
-    const parseWeight = (val: any) => {
-      const str = String(val).replace(/,/g, ''); 
-      const num = parseFloat(str);
-      return isNaN(num) ? Infinity : num;
-    };
-
-    const parseValueForSort = (val: any) => {
-      if (val === null || val === undefined) return '';
-      const strVal = String(val).trim();
-      if (/^-?[\d,.]+$/.test(strVal) && /\d/.test(strVal)) {
-        const num = parseFloat(strVal.replace(/,/g, ''));
-        if (!isNaN(num)) return num;
-      }
-      return strVal.toLowerCase();
-    };
-
-    let smallLotIndices = new Set<number>();
-    let pendingExportIndices = new Set<number>();
-
-    if (filterSmallLots && rows.length > 0) {
-      const sortedByWeight = [...rows].sort((a, b) => parseWeight(a.row[COL_IDX_WEIGHT]) - parseWeight(b.row[COL_IDX_WEIGHT]));
-      sortedByWeight.slice(0, 10).forEach(item => {
-        if (parseWeight(item.row[COL_IDX_WEIGHT]) !== Infinity) smallLotIndices.add(item.originalIndex);
-      });
-    }
-
-    if (filterPendingExport && rows.length > 0) {
-      rows.forEach(item => {
-        const pendingVal = item.row[PENDING_COL_IDX];
-        if (pendingVal !== null && pendingVal !== undefined && String(pendingVal).trim() !== '') pendingExportIndices.add(item.originalIndex);
-      });
-    }
-
-    if (sortConfig !== null) {
-      rows.sort((a, b) => {
-        const valA = parseValueForSort(a.row[sortConfig.key]);
-        const valB = parseValueForSort(b.row[sortConfig.key]);
-        if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    } else {
-      rows.sort((a, b) => {
-        if (filterSmallLots) {
-          const aSmall = smallLotIndices.has(a.originalIndex);
-          const bSmall = smallLotIndices.has(b.originalIndex);
-          if (aSmall && !bSmall) return -1; 
-          if (!aSmall && bSmall) return 1;  
-        }
-        return 0;
-      });
-    }
-
-    return rows.map(item => ({
-      ...item,
-      isSmall: smallLotIndices.has(item.originalIndex),
-      isPending: pendingExportIndices.has(item.originalIndex)
-    }));
-  }, [data, debouncedSearchTerm, searchColIndex, filterSmallLots, filterPendingExport, sortConfig]);
-
-  // Total Weight Calculation (New)
-  const totalWeight = useMemo(() => {
-    return processedRows.reduce((acc, { row }) => {
-        const val = row[COL_IDX_WEIGHT];
-        if (!val) return acc;
-        // Logic parse số Việt Nam: 1.234,56 -> 1234.56
-        const clean = String(val).replace(/\./g, '').replace(',', '.');
-        const num = parseFloat(clean);
-        return acc + (isNaN(num) ? 0 : num);
-    }, 0);
-  }, [processedRows]);
-
   // Print Handling
   const handleOpenPrint = () => {
     if (selectedForPrint.size === 0) {
@@ -245,7 +151,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
   const handleRowClick = (e: React.MouseEvent, originalIndex: number) => {
     e.stopPropagation();
     if (e.shiftKey && lastSelectedRow !== null) {
-       // Range select
+       // Range select - need to find indices in processedRows to slice
        const start = processedRows.findIndex(r => r.originalIndex === lastSelectedRow);
        const end = processedRows.findIndex(r => r.originalIndex === originalIndex);
        if (start !== -1 && end !== -1) {
@@ -355,7 +261,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
                 {isSelected && <span className="material-symbols-outlined text-[14px] text-white">check</span>}
             </div>
         </div>
-        {row.map((cell, cellIndex) => {
+        {row.map((cell: any, cellIndex: number) => {
             const config = columnConfigs[cellIndex];
             let displayValue = cell;
             if (config.isNumeric) {
@@ -421,10 +327,19 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
              <CheckboxFilter label="Lô lẻ" checked={filterSmallLots} onChange={() => setFilterSmallLots(!filterSmallLots)} colorClass="text-[#FF8C00]"/>
              <CheckboxFilter label="Chờ Xuất" checked={filterPendingExport} onChange={() => setFilterPendingExport(!filterPendingExport)} colorClass="text-[#00ff66]"/>
           </div>
-          <div className="flex items-center gap-2 bg-[#1a1a1a]/60 px-3 h-10 rounded-md border border-white/10 focus-within:border-accent-1/50 transition-colors flex-grow md:w-[260px] w-full">
+          <div className="flex items-center gap-2 bg-[#1a1a1a]/60 px-3 h-10 rounded-md border border-white/10 focus-within:border-accent-1/50 transition-colors flex-grow md:w-[260px] w-full relative">
             <span className="material-symbols-outlined text-gray-400 text-[20px]">search</span>
-            <input type="text" placeholder="Tìm kiếm..." className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500" value={inputValue} onChange={(e) => setInputValue(e.target.value)}/>
-            {inputValue && <button onClick={() => setInputValue('')} aria-label="Xóa tìm kiếm" className="text-gray-500 hover:text-white"><span className="material-symbols-outlined text-[16px]">close</span></button>}
+            <input 
+                type="text" 
+                placeholder="Tìm kiếm..." 
+                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500" 
+                value={inputValue} 
+                onChange={(e) => handleSearchChange(e.target.value)}
+            />
+            {isPendingSearch && (
+                <div className="absolute right-8 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            )}
+            {inputValue && <button onClick={() => handleSearchChange('')} aria-label="Xóa tìm kiếm" className="text-gray-500 hover:text-white"><span className="material-symbols-outlined text-[16px]">close</span></button>}
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="relative h-10 shrink-0 flex-grow md:flex-grow-0">
@@ -469,7 +384,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
 
          {/* LIST BODY */}
          <div className="flex-1">
-             <ReactWindow.FixedSizeList
+             <FixedSizeList
                 height={listSize.height - 48} // Subtract approximate header height
                 itemCount={processedRows.length}
                 itemSize={ROW_HEIGHT}
@@ -477,7 +392,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({ data, onRefresh, onUpda
                 className="custom-scrollbar"
              >
                 {Row}
-             </ReactWindow.FixedSizeList>
+             </FixedSizeList>
              {processedRows.length === 0 && (
                  <div className="absolute inset-0 top-[48px] flex flex-col items-center justify-center text-gray-500 italic">
                     <span className="material-symbols-outlined text-4xl opacity-30">search_off</span>

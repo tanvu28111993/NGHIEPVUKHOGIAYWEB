@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { formatNumberVN } from '../utils/formatters';
 import { useToast } from './ToastContext';
-import * as ReactWindow from 'react-window';
+import { FixedSizeList } from 'react-window';
+import { useHistoryData } from '../hooks/useHistoryData';
 
 interface HistoryPageProps {
   exportData: string[]; // Dữ liệu XUẤT
@@ -12,22 +13,18 @@ interface HistoryPageProps {
 }
 
 const ROW_HEIGHT = 48;
-const CHUNK_SIZE = 5000; 
-
-// Các index quan trọng
 const COL_IDX_WEIGHT = 11;
 const QUANTITY_COL_IDX = 12;
 
 const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defaultHeaders, onRefresh }) => {
+  // UI State
   const [inputValue, setInputValue] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [searchColIndex, setSearchColIndex] = useState<string>('all');
   const [sortConfig, setSortConfig] = useState<{ key: number; direction: 'asc' | 'desc' } | null>(null);
-  
-  // --- SOURCE SELECTION STATE ---
   const [sourceConfig, setSourceConfig] = useState({ export: true, import: false });
 
-  // --- NEW DATE PICKER STATE ---
+  // Date Picker State
   const currentYear = new Date().getFullYear();
   const [selectedMonths, setSelectedMonths] = useState<Set<string>>(() => {
       const now = new Date();
@@ -37,12 +34,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
   const [pickerViewYear, setPickerViewYear] = useState(currentYear);
   const datePickerRef = useRef<HTMLDivElement>(null);
 
-  // --- PROCESSING STATE ---
-  const [processedRows, setProcessedRows] = useState<{ row: string[], originalIndex: number, type: 'export' | 'import' }[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  // Virtual List Sizer
+  // Virtual List
   const containerRef = useRef<HTMLDivElement>(null);
   const [listSize, setListSize] = useState({ width: 0, height: 600 });
 
@@ -56,6 +48,17 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
         "Rộng (cm)", "Trọng Lượng", "Số Lượng", "Đơn hàng/ Khách hàng", 
         "Mã vật tư", "Vị Trí", "Vật Tư Chờ Xuất", "Người Xuất", "Thời Gian Xuất"
       ];
+
+  // --- USE WEB WORKER HOOK ---
+  const { processedRows, isProcessing, progress } = useHistoryData(
+    exportData,
+    importData,
+    sourceConfig,
+    selectedMonths,
+    debouncedSearchTerm,
+    searchColIndex,
+    sortConfig
+  );
 
   // Debounce input search
   useEffect(() => {
@@ -96,54 +99,6 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
     setSortConfig({ key: colIndex, direction });
   };
 
-  // --- HELPER: Parse Timestamp from Row ---
-  const getTimestampFromRow = (rowStr: string): number => {
-      if (!rowStr) return 0;
-      const lastPipeIndex = rowStr.lastIndexOf('|');
-      if (lastPipeIndex === -1) return 0;
-      const datePart = rowStr.substring(lastPipeIndex + 1).trim();
-      const [dStr, tStr] = datePart.split(' ');
-      if (!dStr) return 0;
-      
-      const [day, month, year] = dStr.split('/').map(Number);
-      if (!year || !month || !day) return 0;
-
-      let h = 0, m = 0, s = 0;
-      if (tStr) {
-          const parts = tStr.split(':').map(Number);
-          if (!isNaN(parts[0])) h = parts[0];
-          if (!isNaN(parts[1])) m = parts[1];
-          if (!isNaN(parts[2])) s = parts[2];
-      }
-      return new Date(year, month - 1, day, h, m, s).getTime();
-  };
-
-  // --- HELPER: Trích xuất YYYYMM Robust ---
-  const getYearMonthFromRow = (rowStr: string): number => {
-      if (!rowStr) return 0;
-      const lastPipeIndex = rowStr.lastIndexOf('|');
-      if (lastPipeIndex === -1) return 0;
-      const datePart = rowStr.substring(lastPipeIndex + 1).trim();
-      
-      const firstSlash = datePart.indexOf('/');
-      const secondSlash = datePart.indexOf('/', firstSlash + 1);
-      
-      if (firstSlash > 0 && secondSlash > firstSlash) {
-           const monthStr = datePart.substring(firstSlash + 1, secondSlash);
-           let endOfYear = datePart.indexOf(' ', secondSlash + 1);
-           if (endOfYear === -1) endOfYear = datePart.length;
-           const yearStr = datePart.substring(secondSlash + 1, endOfYear);
-           
-           const m = parseInt(monthStr, 10);
-           const y = parseInt(yearStr, 10);
-           
-           if (!isNaN(m) && !isNaN(y)) {
-               return y * 100 + m;
-           }
-      }
-      return 0;
-  };
-
   const availableYears = Array.from({length: 5}, (_, i) => currentYear - i);
 
   const toggleMonth = (year: number, month: number) => {
@@ -179,171 +134,6 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
 
   const clearDateFilter = () => setSelectedMonths(new Set());
 
-  // --- MERGE & SORT DATA LOGIC ---
-  const activeHistoryData = useMemo(() => {
-      let combined: { line: string, type: 'export' | 'import' }[] = [];
-      if (sourceConfig.export && exportData) {
-          combined = combined.concat(exportData.map(line => ({ line, type: 'export' as const })));
-      }
-      if (sourceConfig.import && importData) {
-          combined = combined.concat(importData.map(line => ({ line, type: 'import' as const })));
-      }
-      
-      // AUTO SORT: Ascending
-      combined.sort((a, b) => getTimestampFromRow(a.line) - getTimestampFromRow(b.line));
-      
-      return combined;
-  }, [exportData, importData, sourceConfig]);
-
-  // --- DATE RANGE LOGIC ---
-  const dateRangeIndices = useMemo(() => {
-    if (!activeHistoryData || activeHistoryData.length === 0 || selectedMonths.size === 0) {
-        return { start: 0, end: (activeHistoryData?.length || 0) - 1 };
-    }
-
-    let minYYYYMM = 999999;
-    let maxYYYYMM = 0;
-    
-    selectedMonths.forEach(key => {
-        const [y, m] = key.split('-').map(Number);
-        const val = y * 100 + m;
-        if (val < minYYYYMM) minYYYYMM = val;
-        if (val > maxYYYYMM) maxYYYYMM = val;
-    });
-
-    const totalRows = activeHistoryData.length;
-    let low = 0, high = totalRows - 1;
-    let start = -1;
-    while (low <= high) {
-        const mid = (low + high) >>> 1;
-        const val = getYearMonthFromRow(activeHistoryData[mid].line);
-        if (val === 0) { low = mid + 1; continue; }
-
-        if (val >= minYYYYMM) {
-            start = mid;
-            high = mid - 1;
-        } else {
-            low = mid + 1;
-        }
-    }
-
-    low = 0; high = totalRows - 1;
-    let end = -1;
-    while (low <= high) {
-        const mid = (low + high) >>> 1;
-        const val = getYearMonthFromRow(activeHistoryData[mid].line);
-        if (val === 0) { high = mid - 1; continue; }
-
-        if (val <= maxYYYYMM) {
-            end = mid;
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
-    }
-
-    if (start === -1 || end === -1 || start > end) {
-         return { start: 0, end: totalRows - 1 };
-    }
-
-    return { start, end };
-  }, [activeHistoryData, selectedMonths]);
-
-  // --- DATA PROCESSING EFFECT ---
-  useEffect(() => {
-    if (!activeHistoryData) return;
-    
-    let isCancelled = false;
-    setIsProcessing(true);
-    setProgress(0);
-
-    const runProcessing = async () => {
-        const { start: startIdx, end: endIdx } = dateRangeIndices;
-        
-        const selectedSet = selectedMonths;
-        const hasDateFilter = selectedSet.size > 0;
-
-        const results: { row: string[], originalIndex: number, type: 'export' | 'import' }[] = [];
-        
-        const lowerTerm = debouncedSearchTerm.toLowerCase();
-        const keywords = lowerTerm.split(';').map(k => k.trim()).filter(k => k.length > 0);
-        const hasKeywords = keywords.length > 0;
-        const colIdxSearch = searchColIndex !== 'all' ? parseInt(searchColIndex, 10) : -1;
-
-        const rangeCount = endIdx - startIdx + 1;
-        let processedCount = 0;
-
-        for (let i = startIdx; i <= endIdx; i += CHUNK_SIZE) {
-            if (isCancelled) return;
-
-            const chunkStart = i;
-            const chunkEnd = Math.min(endIdx, i + CHUNK_SIZE - 1);
-            
-            for (let j = chunkStart; j <= chunkEnd; j++) {
-                const { line: rawLine, type } = activeHistoryData[j];
-                
-                if (hasDateFilter) {
-                    const val = getYearMonthFromRow(rawLine);
-                    if (val === 0) continue;
-                    const y = Math.floor(val / 100);
-                    const m = val % 100;
-                    const key = `${y}-${String(m).padStart(2, '0')}`;
-                    if (!selectedSet.has(key)) continue;
-                }
-
-                if (hasKeywords) {
-                     if (!keywords.every(k => rawLine.toLowerCase().includes(k))) {
-                         continue; 
-                     }
-                     
-                     const parts = rawLine.split('|');
-                     if (colIdxSearch !== -1) {
-                        const cell = parts[colIdxSearch];
-                        const match = keywords.every(k => String(cell || '').toLowerCase().includes(k));
-                        if (!match) continue;
-                     } 
-                     results.push({ row: parts, originalIndex: j, type });
-                } else {
-                    results.push({ row: rawLine.split('|'), originalIndex: j, type });
-                }
-            }
-
-            processedCount += (chunkEnd - chunkStart + 1);
-            setProgress(Math.round((processedCount / rangeCount) * 100));
-            
-            await new Promise(resolve => setTimeout(resolve, 0));
-        }
-
-        if (sortConfig !== null && !isCancelled) {
-             const parseValueForSort = (val: any) => {
-                if (val === null || val === undefined) return '';
-                const strVal = String(val).trim();
-                if (/^-?[\d,.]+$/.test(strVal) && /\d/.test(strVal)) {
-                    const num = parseFloat(strVal.replace(/,/g, ''));
-                    if (!isNaN(num)) return num;
-                }
-                return strVal.toLowerCase();
-            };
-            results.sort((a, b) => {
-                const valA = parseValueForSort(a.row[sortConfig.key]);
-                const valB = parseValueForSort(b.row[sortConfig.key]);
-                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-
-        if (!isCancelled) {
-            setProcessedRows(results);
-            setIsProcessing(false);
-        }
-    };
-
-    runProcessing();
-
-    return () => { isCancelled = true; };
-  }, [activeHistoryData, dateRangeIndices, debouncedSearchTerm, searchColIndex, sortConfig, selectedMonths]);
-
   // Column config calculation
   const columnConfigs = useMemo(() => {
     return headers.map((header, idx) => {
@@ -351,6 +141,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
       const padding = 30;
       const calculatedWidth = Math.max(90, (String(header).length * charWidth) + padding);
       
+      // Basic check from first few rows
       let isNumericColumn = false;
       const sampleLimit = Math.min(processedRows.length, 20);
       
@@ -650,7 +441,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
 
          {/* LIST BODY */}
          <div className="flex-1">
-             <ReactWindow.FixedSizeList
+             <FixedSizeList
                 height={listSize.height - 48} // Subtract approximate header height
                 itemCount={processedRows.length}
                 itemSize={ROW_HEIGHT}
@@ -658,7 +449,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ exportData, importData, defau
                 className="custom-scrollbar"
              >
                 {Row}
-             </ReactWindow.FixedSizeList>
+             </FixedSizeList>
              {isProcessing && processedRows.length === 0 && (
                  <div className="absolute inset-0 top-[48px] flex flex-col items-center justify-center text-white bg-black/20 backdrop-blur-[1px]">
                      <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mb-2"></div>
