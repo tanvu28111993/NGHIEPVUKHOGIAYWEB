@@ -80,7 +80,7 @@ export const LoginScreen: React.FC = () => {
             
             {/* System Title & Version moved here */}
             <div className="mb-8 text-center">
-                <p className="text-2xl md:text-2xl font-bold text-white uppercase tracking-widest leading-relaxed">
+                <p className="text-2xl md:text-3xl font-bold text-white uppercase tracking-widest leading-relaxed">
                   Nghiệp Vụ Kho Giấy WEBAPP
                 </p>
             </div>
