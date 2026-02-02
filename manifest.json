@@ -1,0 +1,22 @@
+{
+  "short_name": "Kho Giấy",
+  "name": "Nghiệp Vụ Kho Giấy Pro",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/8zF3c24h/image.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.postimg.cc/8zF3c24h/image.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0f0f0f",
+  "background_color": "#0f0f0f"
+}
