@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { InventoryItem } from '../types';
+import { InventoryItem, ReImportInputItem, ReImportStagingItem } from '../types';
 import { useInventoryQuery } from './useInventoryQuery';
 import { useToast } from '../contexts/ToastContext';
 import { useCommandQueue } from '../contexts/CommandQueueContext';
@@ -9,18 +9,7 @@ import { parseVNToNumber, formatDateTime } from '../utils/formatting';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../utils/constants';
 import { InventoryService } from '../services/inventory';
-
-export interface ReImportInputItem {
-  id: string;
-  sku: string;
-  reImportQty: string;
-  reImportWeight: string; // New field
-}
-
-export interface ReImportStagingItem extends InventoryItem {
-  reImportQty: number;
-  reImportWeight: number;
-}
+import { useWorkflowStore } from '../stores/workflowStore';
 
 export const useReImportManager = () => {
   const { inventory } = useInventoryQuery(); // Still needed for optimistic updates
@@ -28,6 +17,17 @@ export const useReImportManager = () => {
   const { addCommand } = useCommandQueue();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Sử dụng Store thay vì useState cục bộ
+  const { 
+      reImportInputList: inputList, 
+      setReImportInputList: setInputList,
+      reImportStagingList: reImportList,
+      setReImportStagingList: setReImportList,
+      resetReImportState
+  } = useWorkflowStore();
+
+  const [isLoadingSheet, setIsLoadingSheet] = useState(false);
 
   // Load Recent Exports for Validation (3 Months)
   const { data: recentExports = [] } = useQuery({
@@ -37,13 +37,6 @@ export const useReImportManager = () => {
       refetchOnWindowFocus: false
   });
 
-  // Left Panel State: List of SKU/Qty/Weight to check
-  const [inputList, setInputList] = useState<ReImportInputItem[]>([]);
-  
-  // Right Panel State: Validated items ready for re-import
-  const [reImportList, setReImportList] = useState<ReImportStagingItem[]>([]);
-  const [isLoadingSheet, setIsLoadingSheet] = useState(false);
-
   // 1. Add Empty Row
   const addEmptyRow = useCallback(() => {
     setInputList(prev => [...prev, {
@@ -52,7 +45,7 @@ export const useReImportManager = () => {
         reImportQty: '1',
         reImportWeight: ''
     }]);
-  }, []);
+  }, [setInputList]);
 
   // 2. Update Row
   const updateInputItem = useCallback((id: string, field: keyof ReImportInputItem, value: string) => {
@@ -64,15 +57,15 @@ export const useReImportManager = () => {
         }
         return item;
     }));
-  }, []);
+  }, [setInputList]);
 
   const removeInputItem = useCallback((id: string) => {
     setInputList(prev => prev.filter(item => item.id !== id));
-  }, []);
+  }, [setInputList]);
 
   const clearInputList = useCallback(() => {
     setInputList([]);
-  }, []);
+  }, [setInputList]);
 
   // Fetch from Sheet 'SKUN'
   const handleFetchFromSheet = useCallback(async () => {
@@ -123,7 +116,7 @@ export const useReImportManager = () => {
     } finally {
         setIsLoadingSheet(false);
     }
-  }, [reImportList, addToast]);
+  }, [reImportList, addToast, setInputList]);
 
   // 3. Check & Transfer Logic (Use Recent Exports for Validation)
   const checkAndTransfer = useCallback(() => {
@@ -188,12 +181,12 @@ export const useReImportManager = () => {
 
     setInputList(remainingInputs);
 
-  }, [inputList, recentExports, inventory, addToast, reImportList]);
+  }, [inputList, recentExports, inventory, addToast, reImportList, setReImportList, setInputList]);
 
   // 4. Remove from Re-Import List
   const removeReImportItem = useCallback((sku: string) => {
     setReImportList(prev => prev.filter(item => item.sku !== sku));
-  }, []);
+  }, [setReImportList]);
 
   // 5. Confirm Re-Import (BATCH)
   const handleConfirmReImport = useCallback(async () => {
@@ -272,13 +265,13 @@ export const useReImportManager = () => {
         });
 
         addToast(`Đã nhập lại ${reImportList.length} mã. Dữ liệu đang được đồng bộ.`, "success");
-        setReImportList([]);
+        resetReImportState();
 
     } catch (error) {
         console.error("Re-import error", error);
         addToast("Lỗi khi thực hiện nhập lại", "error");
     }
-  }, [reImportList, addCommand, addToast, user, queryClient, inventory]);
+  }, [reImportList, addCommand, addToast, user, queryClient, inventory, resetReImportState]);
 
   return {
     inputList,

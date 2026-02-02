@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ExportStagingItem } from '../../../hooks/useExportManager';
+import { ExportStagingItem } from '../../../types';
 import { INVENTORY_COLUMNS } from '../../../utils/inventoryColumnConfig';
 import { X, AlertTriangle } from 'lucide-react';
 import { formatNumberToVN } from '../../../utils/formatting';

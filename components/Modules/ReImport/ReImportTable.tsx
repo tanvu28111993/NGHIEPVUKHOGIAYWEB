@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ReImportStagingItem } from '../../../hooks/useReImportManager';
+import { ReImportStagingItem } from '../../../types';
 import { INVENTORY_COLUMNS } from '../../../utils/inventoryColumnConfig';
 import { X } from 'lucide-react';
 import { formatNumberToVN } from '../../../utils/formatting';

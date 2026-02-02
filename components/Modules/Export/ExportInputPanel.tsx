@@ -1,8 +1,9 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Card } from '../../UI/Card';
 import { Button } from '../../UI/Button';
 import { ScanLine, ArrowRightLeft, X, Plus, CloudDownload, Eraser, Loader2 } from 'lucide-react';
-import { ExportInputItem } from '../../../hooks/useExportManager';
+import { ExportInputItem } from '../../../types';
 
 interface ExportInputPanelProps {
   inputList: ExportInputItem[];

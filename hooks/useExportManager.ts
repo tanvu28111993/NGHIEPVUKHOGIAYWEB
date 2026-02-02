@@ -1,5 +1,6 @@
+
 import { useState, useCallback } from 'react';
-import { InventoryItem } from '../types';
+import { InventoryItem, ExportInputItem, ExportStagingItem } from '../types';
 import { useInventoryQuery } from './useInventoryQuery';
 import { useToast } from '../contexts/ToastContext';
 import { useCommandQueue } from '../contexts/CommandQueueContext';
@@ -8,17 +9,7 @@ import { parseVNToNumber, formatDateTime, formatNumberToVN } from '../utils/form
 import { InventoryService } from '../services/inventory';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../utils/constants';
-
-export interface ExportInputItem {
-  id: string;
-  sku: string;
-  exportQty: string;
-}
-
-export interface ExportStagingItem extends InventoryItem {
-  exportQty: number;
-  exportWeight: number;
-}
+import { useWorkflowStore } from '../stores/workflowStore';
 
 export const useExportManager = () => {
   const { inventory } = useInventoryQuery();
@@ -27,18 +18,20 @@ export const useExportManager = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Left Panel State: List of SKU/Qty to check
-  const [inputList, setInputList] = useState<ExportInputItem[]>([]);
-  
-  // Right Panel State: Validated items ready for export
-  const [exportList, setExportList] = useState<ExportStagingItem[]>([]);
+  // Sử dụng Store thay vì useState cục bộ
+  const { 
+      exportInputList: inputList, 
+      setExportInputList: setInputList,
+      exportStagingList: exportList,
+      setExportStagingList: setExportList,
+      resetExportState
+  } = useWorkflowStore();
 
   // Loading state for fetching sheet
   const [isLoadingSheet, setIsLoadingSheet] = useState(false);
 
-  // 1. Add to Input List (Legacy/Single Add) -> Replaced by direct manipulation
+  // 1. Add to Input List (Legacy/Single Add)
   const addToInputList = useCallback((sku: string, qty: string) => {
-    // Legacy support if needed, but we mostly use addEmptyRow or handleFetchFromSheet now
     const cleanSku = sku.trim().toUpperCase();
     const cleanQty = qty.replace(',', '.');
 
@@ -52,7 +45,7 @@ export const useExportManager = () => {
       sku: cleanSku,
       exportQty: cleanQty || '1'
     }, ...prev]);
-  }, [exportList, addToast]);
+  }, [exportList, addToast, setInputList]);
 
   // NEW: Add Empty Row
   const addEmptyRow = useCallback(() => {
@@ -61,7 +54,7 @@ export const useExportManager = () => {
         sku: '',
         exportQty: '1'
     }]);
-  }, []);
+  }, [setInputList]);
 
   // NEW: Update Row
   const updateInputItem = useCallback((id: string, field: keyof ExportInputItem, value: string) => {
@@ -73,7 +66,7 @@ export const useExportManager = () => {
         }
         return item;
     }));
-  }, []);
+  }, [setInputList]);
 
   // NEW: Fetch from Sheet 'SKUX'
   const handleFetchFromSheet = useCallback(async () => {
@@ -123,15 +116,15 @@ export const useExportManager = () => {
     } finally {
         setIsLoadingSheet(false);
     }
-  }, [exportList, addToast]);
+  }, [exportList, addToast, setInputList]);
 
   const removeInputItem = useCallback((id: string) => {
     setInputList(prev => prev.filter(item => item.id !== id));
-  }, []);
+  }, [setInputList]);
 
   const clearInputList = useCallback(() => {
     setInputList([]);
-  }, []);
+  }, [setInputList]);
 
   // 2. Check & Transfer Logic
   const checkAndTransfer = useCallback(() => {
@@ -205,15 +198,15 @@ export const useExportManager = () => {
       addToast(`Không tìm thấy ${notFoundSkus.length} mã SKU trong kho`, "error");
     }
 
-    // Update Input List with only remaining/invalid items (plus empty rows if any were filtered out previously, but usually we just keep the ones that failed)
+    // Update Input List with only remaining/invalid items
     setInputList(remainingInputs);
 
-  }, [inputList, inventory, addToast, exportList]);
+  }, [inputList, inventory, addToast, exportList, setExportList, setInputList]);
 
   // 3. Remove from Export List (Right Panel)
   const removeExportItem = useCallback((sku: string) => {
     setExportList(prev => prev.filter(item => item.sku !== sku));
-  }, []);
+  }, [setExportList]);
 
   // NEW: Handle Export CSV
   const handleExportCSV = useCallback(() => {
@@ -349,7 +342,6 @@ export const useExportManager = () => {
             if (!oldData) return [];
             
             // Create map for fast lookup
-            // Explicitly type the Map to ensure values are InventoryItem
             const exportMap = new Map<string, InventoryItem>(
                 itemsToExport.map(i => [i.sku, i.updatedItem as InventoryItem])
             );
@@ -364,13 +356,13 @@ export const useExportManager = () => {
         });
 
         addToast(`Đã xuất kho ${exportList.length} cuộn giấy. Dữ liệu đang được đồng bộ.`, "success");
-        setExportList([]);
+        resetExportState();
 
     } catch (error) {
         console.error("Export error", error);
         addToast("Lỗi khi thực hiện xuất kho", "error");
     }
-  }, [exportList, addCommand, addToast, user, queryClient]);
+  }, [exportList, addCommand, addToast, user, queryClient, resetExportState]);
 
   return {
     inputList,
@@ -385,6 +377,6 @@ export const useExportManager = () => {
     checkAndTransfer,
     removeExportItem,
     handleConfirmExport,
-    handleExportCSV // Export new function
+    handleExportCSV 
   };
 };

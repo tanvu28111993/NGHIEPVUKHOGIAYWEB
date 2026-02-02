@@ -1,11 +1,12 @@
 
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { InventoryItem } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { useCommandQueue } from '../contexts/CommandQueueContext';
 import { useInventoryQuery } from './useInventoryQuery';
 import { QUERY_KEYS } from '../utils/constants';
+import { useWorkflowStore } from '../stores/workflowStore';
 
 export const useImportManager = () => {
   const { addToast } = useToast();
@@ -13,8 +14,8 @@ export const useImportManager = () => {
   const { inventory } = useInventoryQuery();
   const queryClient = useQueryClient();
 
-  // State lưu danh sách tạm thời
-  const [pendingImports, setPendingImports] = useState<InventoryItem[]>([]);
+  // Sử dụng Store thay vì useState cục bộ
+  const { pendingImports, setPendingImports, resetImportState } = useWorkflowStore();
 
   // Tạo Set chứa các SKU đã tồn tại để tra cứu nhanh (O(1))
   const existingSkus = useMemo(() => {
@@ -73,12 +74,12 @@ export const useImportManager = () => {
 
     setPendingImports(prev => [...newItems, ...prev]);
     addToast(`Đã thêm ${copies} dòng vào bảng tạm`, "info");
-  }, [addToast]);
+  }, [addToast, setPendingImports]);
 
   // Xóa khỏi bảng tạm
   const removeItem = useCallback((index: number) => {
     setPendingImports(prev => prev.filter((_, i) => i !== index));
-  }, []);
+  }, [setPendingImports]);
 
   // Lưu vào kho (Dispatch Command)
   const saveToInventory = useCallback(async () => {
@@ -112,12 +113,12 @@ export const useImportManager = () => {
         });
 
         addToast(`Đã lưu kho thành công ${pendingImports.length} cuộn giấy!`, "success");
-        setPendingImports([]);
+        resetImportState();
     } catch (error) {
         console.error("Save error", error);
         addToast("Có lỗi xảy ra khi lưu kho.", "error");
     }
-  }, [pendingImports, existingSkus, addCommand, addToast, queryClient]);
+  }, [pendingImports, existingSkus, addCommand, addToast, queryClient, resetImportState]);
 
   return {
     pendingImports,

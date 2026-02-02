@@ -3,7 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { Card } from '../../UI/Card';
 import { Button } from '../../UI/Button';
 import { ScanLine, ArrowRightLeft, X, Plus, Eraser, CloudDownload, Loader2 } from 'lucide-react';
-import { ReImportInputItem } from '../../../hooks/useReImportManager';
+import { ReImportInputItem } from '../../../types';
 
 interface ReImportInputPanelProps {
   inputList: ReImportInputItem[];
