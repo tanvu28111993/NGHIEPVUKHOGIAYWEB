@@ -226,7 +226,8 @@ export const useReImportManager = () => {
                      quantity: newQty,
                      weight: newWeight,
                      lastUpdated: currentTime,
-                     importer: currentUser
+                     importer: currentUser,
+                     pendingOut: '' // XÓA TRẮNG TRƯỜNG CHỜ XUẤT VÌ ĐÃ ĐƯỢC NHẬP LẠI
                  }
              };
         });
