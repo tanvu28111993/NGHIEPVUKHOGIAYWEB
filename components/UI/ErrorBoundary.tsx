@@ -2,24 +2,27 @@ import React, { ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { Button } from './Button';
 
-interface Props {
+interface ErrorBoundaryProps {
   children?: ReactNode;
   /* Key giúp reset ErrorBoundary khi chuyển trang (Optional) */
   resetKey?: string;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     // Cập nhật state để lần render tiếp theo hiển thị UI thay thế
     return { hasError: true, error };
   }
@@ -29,7 +32,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: ErrorBoundaryProps) {
     // Nếu key thay đổi (người dùng chuyển menu), reset lại trạng thái lỗi
     if (this.props.resetKey !== prevProps.resetKey && this.state.hasError) {
       this.setState({ hasError: false, error: null });
