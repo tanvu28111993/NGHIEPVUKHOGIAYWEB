@@ -5,6 +5,12 @@
     {
       "src": "https://i.postimg.cc/8zF3c24h/image.png",
       "type": "image/png",
+      "sizes": "144x144",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.postimg.cc/8zF3c24h/image.png",
+      "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
@@ -15,6 +21,7 @@
       "purpose": "any maskable"
     }
   ],
+  "id": "/",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#0f0f0f",

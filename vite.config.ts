@@ -37,7 +37,14 @@ export default defineConfig(({ mode }) => {
             background_color: '#0f0f0f',
             display: 'standalone',
             start_url: '/',
+            id: '/',
             icons: [
+              {
+                src: 'https://i.postimg.cc/8zF3c24h/image.png',
+                sizes: '144x144',
+                type: 'image/png',
+                purpose: 'any maskable'
+              },
               {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
                 sizes: '192x192',
