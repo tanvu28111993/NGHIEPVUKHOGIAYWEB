@@ -13,16 +13,11 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState;
-
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     // Cập nhật state để lần render tiếp theo hiển thị UI thay thế

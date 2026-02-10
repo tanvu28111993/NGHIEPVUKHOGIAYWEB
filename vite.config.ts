@@ -41,21 +41,27 @@ export default defineConfig(({ mode }) => {
             icons: [
               {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
-                sizes: '144x144',
+                sizes: '192x192',
                 type: 'image/png',
-                purpose: 'any maskable'
+                purpose: 'any'
               },
               {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
                 sizes: '192x192',
                 type: 'image/png',
-                purpose: 'any maskable'
+                purpose: 'maskable'
               },
               {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
                 sizes: '512x512',
                 type: 'image/png',
-                purpose: 'any maskable'
+                purpose: 'any'
+              },
+              {
+                src: 'https://i.postimg.cc/8zF3c24h/image.png',
+                sizes: '512x512',
+                type: 'image/png',
+                purpose: 'maskable'
               }
             ]
           },
