@@ -1,19 +1,9 @@
 
 import React from 'react';
 import { useAuth } from '../../contexts';
-import { MenuId, MenuItem } from '../../types';
-import { 
-  LayoutDashboard, 
-  MapPin, 
-  Package, 
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  RotateCcw, 
-  History,
-  LogOut,
-  Loader2
-} from 'lucide-react';
-import { FULL_WIDTH_MENUS } from '../../utils';
+import { MenuId } from '../../types';
+import { LogOut, Loader2 } from 'lucide-react';
+import { APP_ROUTES } from '../../utils/navigationConfig';
 
 interface SidebarProps {
   currentMenu: MenuId;
@@ -21,17 +11,6 @@ interface SidebarProps {
   isCollapsed: boolean;
   isPending?: boolean;
 }
-
-// Optimization: Define menu items outside the component to prevent recreation on every render
-const MENU_ITEMS: MenuItem[] = [
-  { id: 'OVERVIEW', label: 'TỔNG QUAN', icon: LayoutDashboard },
-  { id: 'LOCATIONS', label: 'VỊ TRÍ', icon: MapPin },
-  { id: 'INVENTORY', label: 'TỒN KHO', icon: Package },
-  { id: 'IMPORT', label: 'NHẬP KHO', icon: ArrowDownToLine },
-  { id: 'EXPORT', label: 'XUẤT KHO', icon: ArrowUpFromLine },
-  { id: 'RE_IMPORT', label: 'NHẬP LẠI', icon: RotateCcw },
-  { id: 'HISTORY', label: 'LỊCH SỬ', icon: History },
-];
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   currentMenu, 
@@ -52,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Menu Items */}
       <div className="flex-1 px-3 py-6 overflow-y-auto mt-2">
         <nav className="space-y-2">
-          {MENU_ITEMS.map((item) => {
+          {APP_ROUTES.map((item) => {
             const Icon = item.icon;
             const isActive = currentMenu === item.id;
             
@@ -69,7 +48,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     : 'text-gray-400 hover:bg-white/10 hover:text-white'}
                 `}
               >
-                {/* Updated Icon: Size changed to w-6 h-6 */}
                 <Icon className={`w-6 h-6 relative z-10 transition-colors duration-200 text-white`} />
                 
                 {!isCollapsed && (
@@ -105,7 +83,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           `}
           title="Đăng xuất"
         >
-          {/* Updated Logout Icon: Size changed to w-6 h-6 */}
           <LogOut className="w-6 h-6 relative z-10 text-red-500 group-hover:text-white transition-colors duration-200" />
           
           {!isCollapsed && (

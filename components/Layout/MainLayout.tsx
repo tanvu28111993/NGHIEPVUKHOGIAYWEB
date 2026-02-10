@@ -1,11 +1,11 @@
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useMemo } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { ContentRouter } from './ContentRouter';
 import { MenuId } from '../../types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { FULL_WIDTH_MENUS } from '../../utils';
+import { APP_ROUTES } from '../../utils/navigationConfig';
 import { useGlobalShortcuts } from '../../hooks/useGlobalShortcuts';
 
 export const MainLayout: React.FC = () => {
@@ -16,8 +16,11 @@ export const MainLayout: React.FC = () => {
   // Kích hoạt phím tắt toàn cục
   useGlobalShortcuts();
 
-  // Determine if current page requires Full Width (Expanded) mode
-  const isFullWidthPage = FULL_WIDTH_MENUS.includes(currentMenu);
+  // Determine layout mode from config
+  const isFullWidthPage = useMemo(() => {
+      const route = APP_ROUTES.find(r => r.id === currentMenu);
+      return route?.isFullWidth || false;
+  }, [currentMenu]);
 
   const handleMenuChange = (id: MenuId) => {
     startTransition(() => {

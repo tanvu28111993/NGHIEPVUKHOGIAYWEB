@@ -38,6 +38,8 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                     margin: 0; 
                     font-family: Arial, sans-serif; 
                     background: white;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
                   }
                   .print-page {
                     width: ${paperWidth}mm;
@@ -62,6 +64,10 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                       text-align: center;
                       line-height: 1.2;
                   }
+                  img {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                  }
                   @media print {
                      .label-item { border: none; }
                      body { -webkit-print-color-adjust: exact; }
@@ -71,7 +77,13 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
               <body>
                 ${content}
                 <script>
-                   window.onload = function() { window.print(); window.close(); }
+                   // Đợi load xong và delay thêm 500ms để đảm bảo ảnh QR render kịp trên Chrome
+                   window.onload = function() { 
+                      setTimeout(function() {
+                        window.print(); 
+                        window.close(); 
+                      }, 500);
+                   }
                 </script>
               </body>
             </html>
@@ -178,7 +190,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                                             key={el.id}
                                             src={generateQRCodeUrl(qrData)}
                                             alt="QR"
-                                            loading="lazy"
+                                            loading="eager" // Quan trọng: Tải ngay lập tức để kịp in
                                             style={{
                                                 position: 'absolute',
                                                 left: `${el.x / template.width * 100}%`,

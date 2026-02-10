@@ -12,15 +12,18 @@ interface ExportTableProps {
 }
 
 export const ExportTable: React.FC<ExportTableProps> = ({ data, onRemove }) => {
-  // Define custom columns for Export with explicit type to ensure 'format' property is recognized
-  const exportColumns: ColumnConfig<any>[] = [
+  // Define custom columns for Export with explicit type
+  const exportColumns: ColumnConfig<ExportStagingItem>[] = [
       { header: 'TL Xuất (KG)', width: 120, accessor: 'exportWeight', isNumeric: true },
       { header: 'SL Xuất', width: 100, accessor: 'exportQty', isNumeric: true }
   ];
 
-  // Merge with standard columns
-  // Cast INVENTORY_COLUMNS to any to allow merging if strict types complain about accessor compatibility
-  const columns = [...exportColumns, ...INVENTORY_COLUMNS as ColumnConfig<any>[]];
+  // Merge with standard columns safely. 
+  // Cast INVENTORY_COLUMNS to ColumnConfig<ExportStagingItem>[] is safe because ExportStagingItem extends InventoryItem
+  const columns: ColumnConfig<ExportStagingItem>[] = [
+      ...exportColumns, 
+      ...(INVENTORY_COLUMNS as unknown as ColumnConfig<ExportStagingItem>[])
+  ];
 
   const totalWidth = columns.reduce((acc, col) => acc + (col.width || 100), 0) + 100; // +50 STT + 50 Action
 
@@ -84,7 +87,6 @@ export const ExportTable: React.FC<ExportTableProps> = ({ data, onRemove }) => {
                                     </button>
                                 </td>
                                 {columns.map((col, colIndex) => {
-                                    // @ts-ignore
                                     let val = item[col.accessor];
                                     
                                     // Formatting

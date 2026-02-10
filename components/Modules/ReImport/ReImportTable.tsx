@@ -13,13 +13,16 @@ interface ReImportTableProps {
 
 export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) => {
   // Define custom columns for Re-Import
-  const reImportColumns: ColumnConfig<any>[] = [
+  const reImportColumns: ColumnConfig<ReImportStagingItem>[] = [
       { header: 'TL Nhập (KG)', width: 120, accessor: 'reImportWeight', isNumeric: true },
       { header: 'SL Nhập', width: 100, accessor: 'reImportQty', isNumeric: true }
   ];
 
-  // Merge with standard columns
-  const columns = [...reImportColumns, ...INVENTORY_COLUMNS as ColumnConfig<any>[]];
+  // Merge with standard columns safe casting
+  const columns: ColumnConfig<ReImportStagingItem>[] = [
+      ...reImportColumns, 
+      ...(INVENTORY_COLUMNS as unknown as ColumnConfig<ReImportStagingItem>[])
+  ];
 
   const totalWidth = columns.reduce((acc, col) => acc + (col.width || 100), 0) + 100;
 
@@ -73,7 +76,6 @@ export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) 
                                     </button>
                                 </td>
                                 {columns.map((col, colIndex) => {
-                                    // @ts-ignore
                                     let val = item[col.accessor];
                                     
                                     if (col.accessor === 'reImportWeight') {

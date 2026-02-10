@@ -1,9 +1,18 @@
+
+import React from 'react';
+
 export type MenuId = 'OVERVIEW' | 'LOCATIONS' | 'INVENTORY' | 'IMPORT' | 'EXPORT' | 'RE_IMPORT' | 'HISTORY';
 
 export interface MenuItem {
   id: MenuId;
   label: string;
   icon: any; 
+}
+
+// Interface mở rộng cho cấu hình Route
+export interface AppRouteConfig extends MenuItem {
+  component: React.LazyExoticComponent<React.FC>;
+  isFullWidth?: boolean; // Cấu hình giao diện (tràn màn hình hay không)
 }
 
 // ISP: Interface cho cấu hình cột, tách biệt logic hiển thị ra khỏi component Table
