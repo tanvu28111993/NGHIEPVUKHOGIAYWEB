@@ -42,13 +42,13 @@ export default defineConfig(({ mode }) => {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
                 sizes: '192x192',
                 type: 'image/png',
-                purpose: 'any'
+                purpose: 'any maskable'
               },
               {
                 src: 'https://i.postimg.cc/8zF3c24h/image.png',
                 sizes: '512x512',
                 type: 'image/png',
-                purpose: 'any'
+                purpose: 'any maskable'
               }
             ]
           },
