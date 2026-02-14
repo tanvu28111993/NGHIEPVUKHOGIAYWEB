@@ -1,6 +1,7 @@
 
 // Cấu hình API
-// Ưu tiên sử dụng biến môi trường, fallback về hardcoded URL cho development nhanh
+// Ưu tiên sử dụng biến môi trường VITE_API_URL.
+// Đảm bảo bạn đã thêm Environment Variable "VITE_API_URL" trong phần Settings của Vercel nếu muốn dùng URL khác mặc định.
 export const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbwndvg64fdQe2gUqm4c-KZdWR-KfstIcpi0Y3QY0P6mKHCn0VtF_CpjJB_WA2Rye6uYgQ/exec';
 
 // Cấu hình UI
