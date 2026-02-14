@@ -5,10 +5,13 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export const HttpService = {
   fetchWithRetry: async (url: string, options: RequestInit, retries = 3, backoff = 300): Promise<Response> => {
     try {
-      // Thêm referrerPolicy: 'no-referrer' để tránh lỗi CORS/Blocking từ Google Script khi gọi từ domain lạ (Vercel)
+      // Cấu hình chuẩn để fetch dữ liệu từ Google Apps Script Web App
       const response = await fetch(url, { 
         ...options, 
-        referrerPolicy: 'no-referrer' 
+        redirect: 'follow',       // Bắt buộc: Tự động follow redirect 302 của Google
+        referrerPolicy: 'no-referrer', // Ẩn referrer để tránh Google chặn request từ domain lạ
+        credentials: 'omit',      // QUAN TRỌNG: Không gửi cookie để tránh lỗi login/auth của Google
+        cache: 'no-store'         // Không cache API response
       });
       
       // Nếu gặp lỗi server (5xx) hoặc quá nhiều request (429), thử lại

@@ -27,9 +27,10 @@ export const COL = {
   TRANSACTION_TYPE: 19 
 };
 
-// --- PURE LOGIC FUNCTIONS (Exported for Unit Testing) ---
+// --- PURE LOGIC FUNCTIONS (Exported for Unit Testing - Main Thread) ---
+// Những hàm này chỉ dùng để test hoặc chạy ở Main Thread nếu cần.
+// Logic thực sự chạy trong Worker nằm ở biến WORKER_CODE bên dưới.
 
-// Helper: Xóa dấu Tiếng Việt để tìm kiếm
 export const removeVietnameseTones = (str: string): string => {
     if (!str) return '';
     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -46,8 +47,6 @@ export const removeVietnameseTones = (str: string): string => {
     str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
     str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
     str = str.replace(/Đ/g, "D");
-    // Some system encode vietnamese combining accent as individual utf-8 characters
-    // \u0300, \u0301, \u0303, \u0309, \u0323
     str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); 
     return str;
 };
@@ -85,7 +84,6 @@ export const formatDateTime = (val: unknown): string => {
 
 export const transformData = (rawData: any[][]): InventoryItem[] => {
     if (Array.isArray(rawData) && rawData.length > 0 && Array.isArray(rawData[0])) {
-         // Note: Inside worker execution, COL/formatDate are injected into scope
          return rawData.map((row) => ({
           sku: String(row[COL.SKU]),
           purpose: String(row[COL.PURPOSE]),
@@ -114,27 +112,18 @@ export const transformData = (rawData: any[][]): InventoryItem[] => {
 
 export const mergeInventory = (currentData: InventoryItem[], newItems: InventoryItem[]): InventoryItem[] => {
     const itemMap = new Map<string, InventoryItem>();
-    
-    // 1. Add existing items
     if (Array.isArray(currentData)) {
         for (let i = 0; i < currentData.length; i++) {
             const item = currentData[i];
-            if (item && item.sku) {
-                itemMap.set(item.sku, item);
-            }
+            if (item && item.sku) itemMap.set(item.sku, item);
         }
     }
-    
-    // 2. Merge new items (update/insert)
     if (Array.isArray(newItems)) {
         for (let i = 0; i < newItems.length; i++) {
             const item = newItems[i];
-            if (item && item.sku) {
-                itemMap.set(item.sku, item);
-            }
+            if (item && item.sku) itemMap.set(item.sku, item);
         }
     }
-    
     return Array.from(itemMap.values());
 };
 
@@ -157,18 +146,132 @@ export const parseDateToTimestamp = (val: unknown): number => {
 };
 
 // --- WORKER CONSTRUCTION ---
-// We inject the functions source code into the worker blob.
+// FIX: We hardcode functions inside the string to prevent minification issues in Production.
+// In Production build, function names like 'transformData' might be renamed to 'a', 
+// causing "a is not defined" inside the worker if we injected them via toString().
+
 export const WORKER_CODE = `
 /* eslint-disable no-restricted-globals */
 
-// 1. INJECTED CONSTANTS & FUNCTIONS
+// 1. DEFINITIONS (Hardcoded to survive minification)
 const COL = ${JSON.stringify(COL)};
-const formatDate = ${formatDate.toString()};
-const formatDateTime = ${formatDateTime.toString()};
-const transformData = ${transformData.toString()};
-const mergeInventory = ${mergeInventory.toString()};
-const parseDateToTimestamp = ${parseDateToTimestamp.toString()};
-const removeVietnameseTones = ${removeVietnameseTones.toString()};
+
+const removeVietnameseTones = (str) => {
+    if (!str) return '';
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+    str = str.replace(/đ/g, "d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    str = str.replace(/\\u0300|\\u0301|\\u0303|\\u0309|\\u0323/g, ""); 
+    return str;
+};
+
+const formatDate = (val) => {
+  if (!val) return "";
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return String(val);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return day + '/' + month + '/' + year;
+  } catch (e) {
+    return String(val);
+  }
+};
+
+const formatDateTime = (val) => {
+  if (!val) return "";
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return String(val);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const h = String(d.getHours()).padStart(2, '0');
+    const m = String(d.getMinutes()).padStart(2, '0');
+    const s = String(d.getSeconds()).padStart(2, '0');
+    return day + '/' + month + '/' + year + ' ' + h + ':' + m + ':' + s;
+  } catch (e) {
+    return String(val);
+  }
+};
+
+const transformData = (rawData) => {
+    if (Array.isArray(rawData) && rawData.length > 0 && Array.isArray(rawData[0])) {
+         return rawData.map((row) => ({
+          sku: String(row[COL.SKU]),
+          purpose: String(row[COL.PURPOSE]),
+          packetCode: String(row[COL.PACKET_CODE]),
+          paperType: String(row[COL.PAPER_TYPE]),
+          gsm: String(row[COL.GSM] || ""),
+          supplier: String(row[COL.SUPPLIER]),
+          manufacturer: String(row[COL.MANUFACTURER]),
+          importDate: formatDate(row[COL.IMPORT_DATE]),
+          productionDate: formatDate(row[COL.PRODUCTION_DATE]),
+          length: Number(row[COL.LENGTH]),
+          width: Number(row[COL.WIDTH]),
+          weight: Number(row[COL.WEIGHT]),
+          quantity: Number(row[COL.QUANTITY]),
+          orderCustomer: String(row[COL.ORDER_CUSTOMER]),
+          materialCode: String(row[COL.MATERIAL_CODE]),
+          location: String(row[COL.LOCATION]),
+          pendingOut: String(row[COL.PENDING_OUT] || ""),
+          importer: String(row[COL.IMPORTER]),
+          lastUpdated: formatDateTime(row[COL.LAST_UPDATED]),
+          transactionType: row[COL.TRANSACTION_TYPE]
+        }));
+      }
+      return rawData;
+};
+
+const mergeInventory = (currentData, newItems) => {
+    const itemMap = new Map();
+    if (Array.isArray(currentData)) {
+        for (let i = 0; i < currentData.length; i++) {
+            const item = currentData[i];
+            if (item && item.sku) itemMap.set(item.sku, item);
+        }
+    }
+    if (Array.isArray(newItems)) {
+        for (let i = 0; i < newItems.length; i++) {
+            const item = newItems[i];
+            if (item && item.sku) itemMap.set(item.sku, item);
+        }
+    }
+    // Convert Iterator to Array manually if needed or use Array.from
+    const result = [];
+    itemMap.forEach(v => result.push(v));
+    return result;
+};
+
+const parseDateToTimestamp = (val) => {
+    if (!val || typeof val !== 'string') return -1;
+    const parts = val.trim().split(' ');
+    const dateParts = parts[0].split('/');
+    if (dateParts.length !== 3) return -1;
+    const day = parseInt(dateParts[0], 10);
+    const month = parseInt(dateParts[1], 10);
+    const year = parseInt(dateParts[2], 10);
+    let hour = 0, minute = 0, second = 0;
+    if (parts[1]) {
+        const timeParts = parts[1].split(':');
+        if (timeParts[0]) hour = parseInt(timeParts[0], 10);
+        if (timeParts[1]) minute = parseInt(timeParts[1], 10);
+        if (timeParts[2]) second = parseInt(timeParts[2], 10);
+    }
+    return new Date(year, month - 1, day, hour, minute, second).getTime();
+};
 
 // 2. WORKER STATE
 let cachedInventory = [];
