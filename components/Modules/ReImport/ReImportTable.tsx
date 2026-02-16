@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { ReImportStagingItem } from '../../../types';
 import { INVENTORY_COLUMNS } from '../../../utils/inventoryColumnConfig';
-import { X } from 'lucide-react';
 import { formatNumberToVN } from '../../../utils/formatting';
 import { ColumnConfig } from '../../../types';
 
@@ -24,7 +22,7 @@ export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) 
       ...(INVENTORY_COLUMNS as unknown as ColumnConfig<ReImportStagingItem>[])
   ];
 
-  const totalWidth = columns.reduce((acc, col) => acc + (col.width || 100), 0) + 100;
+  const totalWidth = columns.reduce((acc, col) => acc + (col.width || 100), 0) + 50; // +50 STT
 
   const weightFormatter = new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -37,9 +35,6 @@ export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) 
               <tr>
                 <th className="sticky left-0 z-30 px-2 py-3 text-center border-b border-r border-gray-800 bg-slate-950 w-[50px]">
                     STT
-                </th>
-                <th className="sticky left-[50px] z-30 px-2 py-3 text-center border-b border-r border-gray-800 bg-slate-950 w-[50px]">
-                    Xóa
                 </th>
                 {columns.map((col, index) => (
                     <th 
@@ -62,18 +57,11 @@ export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) 
                             <tr 
                                 key={item.sku} 
                                 className="transition-colors group cursor-pointer border-l-4 hover:bg-cyan-900/10 border-l-transparent"
+                                onDoubleClick={() => onRemove(item.sku)}
+                                title="Tích đúp để xóa dòng này"
                             >
                                 <td className="sticky left-0 z-20 px-2 py-2 text-center text-sm font-bold text-gray-400 border-r border-gray-800 bg-slate-900 group-hover:bg-slate-900/90">
                                     {index + 1}
-                                </td>
-                                <td className="sticky left-[50px] z-20 px-2 py-2 text-center border-r border-gray-800 bg-slate-900 group-hover:bg-slate-900/90">
-                                    <button 
-                                        onClick={() => onRemove(item.sku)}
-                                        className="text-red-500 hover:text-red-400 transition-colors flex items-center justify-center w-full"
-                                        title="Xóa dòng này"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
                                 </td>
                                 {columns.map((col, colIndex) => {
                                     let val = item[col.accessor];
@@ -109,7 +97,7 @@ export const ReImportTable: React.FC<ReImportTableProps> = ({ data, onRemove }) 
                     })
                 ) : (
                     <tr>
-                        <td colSpan={columns.length + 2} className="px-6 py-12 text-center text-gray-500 italic">
+                        <td colSpan={columns.length + 1} className="px-6 py-12 text-center text-gray-500 italic">
                             Chưa có dữ liệu nhập lại. Vui lòng thêm mã ở bảng bên trái.
                         </td>
                     </tr>
