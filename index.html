@@ -52,34 +52,66 @@
       }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script type="importmap">
-{
-  "imports": {
-    "path": "https://esm.sh/path@^0.12.7",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "zustand/": "https://esm.sh/zustand@^5.0.10/",
-    "zustand": "https://esm.sh/zustand@^5.0.10",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "vitest": "https://esm.sh/vitest@^4.0.18",
-    "idb-keyval": "https://esm.sh/idb-keyval@^6.2.2",
-    "@testing-library/react": "https://esm.sh/@testing-library/react@^16.3.2",
-    "webworker": "https://esm.sh/webworker@^0.8.4",
-    "@tanstack/react-query": "https://esm.sh/@tanstack/react-query@^5.90.20",
-    "vite-plugin-pwa": "https://esm.sh/vite-plugin-pwa@^1.2.0",
-    "@tanstack/react-query-persist-client": "https://esm.sh/@tanstack/react-query-persist-client@^5.90.22",
-    "workbox-precaching": "https://esm.sh/workbox-precaching@^7.4.0",
-    "zod": "https://esm.sh/zod@^4.3.6",
-    "react-hook-form": "https://esm.sh/react-hook-form@^7.71.1",
-    "@hookform/resolvers/": "https://esm.sh/@hookform/resolvers@^5.2.2/"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+    <style type="text/tailwindcss">
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+
+      /* Custom Scrollbar Styles */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a; 
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #444; 
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #DA291C; 
+      }
+
+      /* Global Animation Utilities */
+      @keyframes fade-in {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-fade-in {
+        animation: fade-in 0.3s ease-out forwards;
+      }
+
+      @keyframes progress-indeterminate {
+        0% { transform: translateX(-100%) scaleX(0.2); }
+        50% { transform: translateX(0%) scaleX(0.5); }
+        100% { transform: translateX(100%) scaleX(0.2); }
+      }
+
+      .animate-progress-indeterminate {
+        animation: progress-indeterminate 1.5s infinite linear;
+        width: 100%;
+        transform-origin: left;
+      }
+
+      /* Utility Classes mimicking @apply for common patterns */
+      .card-base {
+        @apply bg-slate-900 border border-gray-800 rounded-xl shadow-sm;
+      }
+
+      .input-base {
+        @apply block w-full bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all;
+      }
+
+      .select-base {
+        @apply w-full bg-slate-800 text-gray-200 text-sm border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red appearance-none cursor-pointer;
+      }
+    </style>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
