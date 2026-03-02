@@ -91,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
          <div className={`text-[10px] text-gray-600 pt-2 border-t border-gray-800/50 ${isCollapsed ? 'text-center' : 'text-center'}`}>
-          {isCollapsed ? 'v1.0' : 'v1.0.0 © 2024 Kho Giấy'}
+          {isCollapsed ? 'v2.0' : '© 2026 Kho Giấy'}
         </div>
       </div>
     </aside>
