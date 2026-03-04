@@ -13,6 +13,8 @@ export interface MenuItem {
 export interface AppRouteConfig extends MenuItem {
   component: React.LazyExoticComponent<React.FC>;
   isFullWidth?: boolean; // Cấu hình giao diện (tràn màn hình hay không)
+  noPadding?: boolean; // Cấu hình bỏ padding (cho dashboard full màn hình)
+  keepAlive?: boolean; // Giữ component luôn mount (tránh reload iframe)
 }
 
 // ISP: Interface cho cấu hình cột, tách biệt logic hiển thị ra khỏi component Table

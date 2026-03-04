@@ -17,9 +17,12 @@ export const MainLayout: React.FC = () => {
   useGlobalShortcuts();
 
   // Determine layout mode from config
-  const isFullWidthPage = useMemo(() => {
+  const { isFullWidthPage, noPadding } = useMemo(() => {
       const route = APP_ROUTES.find(r => r.id === currentMenu);
-      return route?.isFullWidth || false;
+      return {
+        isFullWidthPage: route?.isFullWidth || false,
+        noPadding: route?.noPadding || false
+      };
   }, [currentMenu]);
 
   const handleMenuChange = (id: MenuId) => {
@@ -73,7 +76,7 @@ export const MainLayout: React.FC = () => {
         > 
           {/* Main Container */}
           <main className={`
-            flex-1 flex flex-col ${isFullWidthPage ? 'p-4' : 'p-8'} mx-auto w-full h-full overflow-hidden
+            flex-1 flex flex-col ${noPadding ? 'p-0' : (isFullWidthPage ? 'p-4' : 'p-8')} mx-auto w-full h-full overflow-hidden
             ${isFullWidthPage ? 'max-w-full' : 'max-w-7xl'}
           `}>
             <div className={`flex-1 flex flex-col h-full min-h-0 relative animate-fade-in transition-opacity duration-200 ${isPending ? 'opacity-70 pointer-events-none grayscale-[0.5]' : 'opacity-100'}`}>

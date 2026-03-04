@@ -1,6 +1,31 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export const Overview: React.FC = () => {
-  return null;
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <div className="w-full h-full flex flex-col overflow-hidden relative">
+      {isLoading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900">
+          <Loader2 className="w-12 h-12 text-brand-red animate-spin mb-4" />
+          <p className="text-slate-400 animate-pulse">Đang tải dữ liệu báo cáo...</p>
+        </div>
+      )}
+      
+      <div className={`flex-1 bg-slate-900/50 overflow-hidden relative transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+        <iframe 
+          title="QLK GIAY TONG QUAN" 
+          width="100%" 
+          height="100%" 
+          src="https://app.powerbi.com/view?r=eyJrIjoiNzc1MjljYTYtYjdiMC00Y2E3LTgwMGItMzA4Y2ZiMmEzZGEzIiwidCI6ImI4YjEyY2UxLTk2NDAtNDg3OC04YWE3LWFkMmY1NDlmNzljZSIsImMiOjEwfQ%3D%3D&pageName=41cec83c67153dd83482" 
+          frameBorder="0" 
+          allowFullScreen={true}
+          className="absolute inset-0 w-full h-[calc(100%+37px)]"
+          onLoad={() => setIsLoading(false)}
+        />
+      </div>
+    </div>
+  );
 };

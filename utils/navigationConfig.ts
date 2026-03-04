@@ -13,7 +13,7 @@ import { AppRouteConfig } from '../types';
 
 // Code Splitting (Lazy Loading) centralized here
 const Overview = lazy(() => import('../components/Dashboard/Overview').then(m => ({ default: m.Overview })));
-const LocationManager = lazy(() => import('../components/Modules/Locations/LocationManager').then(m => ({ default: m.LocationManager })));
+const LocationManager = lazy(() => import('../components/Modules/Locations/LocationManager').then(m => ({ default: m.PaperLocationManager })));
 const InventoryManager = lazy(() => import('../components/Modules/Inventory/InventoryManager').then(m => ({ default: m.InventoryManager })));
 const ImportManager = lazy(() => import('../components/Modules/Import/ImportManager').then(m => ({ default: m.ImportManager })));
 const ExportManager = lazy(() => import('../components/Modules/Export/ExportManager').then(m => ({ default: m.ExportManager })));
@@ -26,14 +26,18 @@ export const APP_ROUTES: AppRouteConfig[] = [
     label: 'TỔNG QUAN', 
     icon: LayoutDashboard, 
     component: Overview,
-    isFullWidth: false 
+    isFullWidth: true,
+    noPadding: true,
+    keepAlive: true
   },
   { 
     id: 'LOCATIONS', 
     label: 'VỊ TRÍ', 
     icon: MapPin, 
     component: LocationManager,
-    isFullWidth: false
+    isFullWidth: true,
+    noPadding: true,
+    keepAlive: true
   },
   { 
     id: 'INVENTORY', 
