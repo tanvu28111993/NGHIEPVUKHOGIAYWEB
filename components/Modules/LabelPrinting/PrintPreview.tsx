@@ -4,6 +4,7 @@ import { InventoryItem } from '../../../types';
 import { useLabelStore } from '../../../stores/labelStore';
 import { Button } from '../../UI/Button';
 import { Printer, X, LayoutTemplate } from 'lucide-react';
+import { formatNumberToVN } from '../../../utils/formatting';
 
 interface PrintPreviewProps {
   items: InventoryItem[];
@@ -204,7 +205,12 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                                 } else {
                                     // Field logic: Lấy từ dữ liệu kho
                                     // @ts-ignore
-                                    content = item[el.field] ? String(item[el.field]) : '';
+                                    let val = item[el.field];
+                                    if (['length', 'width', 'weight', 'quantity'].includes(el.field)) {
+                                        content = formatNumberToVN(val);
+                                    } else {
+                                        content = val ? String(val) : '';
+                                    }
                                 }
 
                                 return (

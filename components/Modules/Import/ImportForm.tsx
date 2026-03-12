@@ -8,7 +8,7 @@ import { Input } from '../../UI/Input';
 import { SearchableSelect } from '../../UI/SearchableSelect';
 import { Card } from '../../UI/Card';
 import { Copy, PlusCircle, RotateCcw, Loader2 } from 'lucide-react';
-import { parseVNToNumber, processNumberInput, formatDateTime } from '../../../utils/formatting';
+import { parseVNToNumber, processNumberInput, formatDateTime, formatDate } from '../../../utils/formatting';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
 import { useInventoryFormFields } from '../../../hooks/useInventoryFormFields';
@@ -29,8 +29,8 @@ const INITIAL_FORM_STATE = {
   gsm: '',
   supplier: '',
   manufacturer: '',
-  importDate: new Date().toLocaleDateString('en-GB'),
-  productionDate: new Date().toLocaleDateString('en-GB'),
+  importDate: formatDate(new Date()),
+  productionDate: formatDate(new Date()),
   length: '',
   width: '',
   weight: '',

@@ -7,6 +7,7 @@ import { Select } from '../../UI/Select';
 import { Badge } from '../../UI/Badge';
 import { GLOBAL_EVENTS } from '../../../hooks/useGlobalShortcuts';
 import { FilterState } from '../../../hooks/useInventoryFilter';
+import { formatNumberToVN } from '../../../utils/formatting';
 
 interface InventoryToolbarProps {
   totalWeight: number;
@@ -66,7 +67,7 @@ export const InventoryToolbar: React.FC<InventoryToolbarProps> = ({
           <div className="flex items-center gap-2 mr-auto border-r border-gray-800 pr-4">
               <span className="text-sm font-medium text-gray-400">Tổng:</span>
               <span className="text-xl font-bold text-green-500">
-                  {totalWeight.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Tấn
+                  {formatNumberToVN(totalWeight)} Tấn
               </span>
               <span className="text-xs text-gray-500 ml-2">({totalRows} Dòng)</span>
               {(isPending || isSyncing) && <Loader2 className="w-4 h-4 text-blue-500 animate-spin ml-2" />}

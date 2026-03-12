@@ -1,5 +1,13 @@
 
 
+// Helper: Định dạng ngày chuẩn hệ thống (dd/MM/yyyy)
+export const formatDate = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 // Helper: Định dạng ngày giờ chuẩn hệ thống (dd/MM/yyyy HH:mm:ss)
 export const formatDateTime = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0');

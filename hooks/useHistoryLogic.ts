@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { HistoryService } from '../services/history';
 import { InventoryItem } from '../types';
 import { useToast } from '../contexts/ToastContext';
+import { formatDate } from '../utils/formatting';
 
 const STORAGE_KEY_HISTORY_FILTER = 'HISTORY_FILTER_CONFIG_V1';
 
@@ -52,7 +53,7 @@ export const useHistoryLogic = () => {
       setHistoryData([]); 
       
       try {
-          console.log(`[History] Fetching from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`);
+          console.log(`[History] Fetching from ${formatDate(start)} to ${formatDate(end)}`);
           
           let hasCache = false;
 

@@ -80,7 +80,7 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                  <div className="flex items-center gap-2 border-r border-gray-800 pr-4 min-w-[200px]">
                     <span className="text-sm font-medium text-gray-400">Tổng:</span>
                     <span className="text-xl font-bold text-green-500">
-                        {totalWeight.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Tấn
+                        {formatNumberToVN(totalWeight)} Tấn
                     </span>
                     <span className="text-xs text-gray-500 ml-2">({totalRows} cuộn)</span>
                     {isSyncing && <Loader2 className="w-4 h-4 text-blue-500 animate-spin ml-2" />}

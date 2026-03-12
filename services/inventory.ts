@@ -2,6 +2,7 @@
 import { InventoryItem } from '../types';
 import { HttpService } from './http';
 import { WorkerService } from './worker';
+import { formatDateTime } from '../utils/formatting';
 
 export const InventoryService = {
   /**
@@ -10,7 +11,7 @@ export const InventoryService = {
    */
   fetchInventory: async (lastUpdated: number = 0): Promise<{ items: InventoryItem[], serverTimestamp: number } | null> => {
     try {
-      console.log(`[Service] Fetching inventory changes since: ${new Date(lastUpdated).toLocaleString()}`);
+      console.log(`[Service] Fetching inventory changes since: ${formatDateTime(new Date(lastUpdated))}`);
 
       const params = new URLSearchParams();
       params.append('action', 'getInventory');

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
+import { formatDate } from '../../utils/formatting';
 
 // Chỉ component này sẽ re-render mỗi giây nhờ memo
 export const DateTimeWidget = memo(() => {
@@ -12,9 +13,7 @@ export const DateTimeWidget = memo(() => {
   const days = ['CN', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7'];
   const dayName = days[currentTime.getDay()];
   const timeStr = currentTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
-  const day = currentTime.getDate().toString().padStart(2, '0');
-  const month = (currentTime.getMonth() + 1).toString().padStart(2, '0');
-  const dateStr = `${day}/${month}`;
+  const dateStr = formatDate(currentTime).substring(0, 5); // Just get dd/MM
 
   return (
     <div className="hidden md:flex flex-col justify-center items-center px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 shadow-lg shadow-black/50 min-w-[110px]">
