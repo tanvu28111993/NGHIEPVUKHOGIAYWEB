@@ -6,6 +6,7 @@ import { TimeFilterMatrix } from './TimeFilterMatrix';
 import { Card } from '../../UI/Card';
 import { Input } from '../../UI/Input';
 import { Select } from '../../UI/Select';
+import { formatNumberToVN } from '../../../utils/formatting';
 
 interface HistoryToolbarProps {
   totalRows: number;
@@ -99,7 +100,7 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                   <button
                         onClick={() => onToggleTab('IMPORT')}
                         className={`
-                            h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap
+                            h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95
                             ${activeTabs.includes('IMPORT')
                                 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' 
                                 : 'bg-slate-800 border-slate-600 text-gray-400 hover:text-white hover:border-gray-500'}
@@ -112,7 +113,7 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                   <button
                         onClick={() => onToggleTab('EXPORT')}
                         className={`
-                            h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap
+                            h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95
                             ${activeTabs.includes('EXPORT')
                                 ? 'bg-orange-500/10 border-orange-500 text-orange-500' 
                                 : 'bg-slate-800 border-slate-600 text-gray-400 hover:text-white hover:border-gray-500'}
@@ -143,7 +144,7 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                     <button
                         onClick={() => setShowTimeMatrix(!showTimeMatrix)}
                         className={`
-                        h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap
+                        h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95
                         ${showTimeMatrix 
                             ? 'bg-brand-red text-white border-brand-red shadow-lg shadow-red-900/20' 
                             : 'bg-slate-800 border-slate-600 text-gray-300 hover:text-white hover:border-gray-400'}

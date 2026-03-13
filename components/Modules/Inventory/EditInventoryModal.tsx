@@ -110,7 +110,7 @@ export const EditInventoryModal: React.FC<EditInventoryModalProps> = ({ item, is
             <h2 className="text-xl font-bold text-white">Chỉnh sửa thông tin cuộn giấy</h2>
             <p className="text-sm text-gray-400">Cập nhật thông tin chi tiết cho SKU: <span className="text-brand-red font-mono font-bold">{item.sku}</span></p>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors" title="Đóng (Esc)">
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all hover:shadow-lg active:scale-95" title="Đóng (Esc)">
             <X className="w-6 h-6" />
           </button>
         </div>

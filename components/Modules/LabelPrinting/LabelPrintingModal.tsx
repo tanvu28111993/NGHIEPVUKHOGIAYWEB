@@ -25,20 +25,20 @@ export const LabelPrintingModal: React.FC<Props> = ({ isOpen, onClose, selectedI
             <div className="flex gap-6">
                 <button 
                     onClick={() => setActiveTab('PREVIEW')}
-                    className={`flex items-center gap-2 py-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'PREVIEW' ? 'text-blue-500 border-blue-500' : 'text-gray-400 border-transparent hover:text-white'}`}
+                    className={`flex items-center gap-2 py-4 text-sm font-bold border-b-2 transition-all hover:shadow-lg active:scale-95 ${activeTab === 'PREVIEW' ? 'text-blue-500 border-blue-500' : 'text-gray-400 border-transparent hover:text-white'}`}
                 >
                     <Printer className="w-4 h-4" /> BỐ CỤC IN ({selectedItems.length})
                 </button>
                 <button 
                     onClick={() => setActiveTab('DESIGN')}
-                    className={`flex items-center gap-2 py-4 text-sm font-bold border-b-2 transition-colors ${activeTab === 'DESIGN' ? 'text-brand-red border-brand-red' : 'text-gray-400 border-transparent hover:text-white'}`}
+                    className={`flex items-center gap-2 py-4 text-sm font-bold border-b-2 transition-all hover:shadow-lg active:scale-95 ${activeTab === 'DESIGN' ? 'text-brand-red border-brand-red' : 'text-gray-400 border-transparent hover:text-white'}`}
                 >
                     <PencilRuler className="w-4 h-4" /> THIẾT KẾ MẪU TEM
                 </button>
             </div>
             
             {activeTab === 'DESIGN' && (
-                 <button onClick={onClose} className="text-gray-400 hover:text-white">
+                 <button onClick={onClose} className="text-gray-400 hover:text-white transition-all hover:shadow-lg active:scale-95">
                      Đóng
                  </button>
             )}

@@ -195,7 +195,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onAddItems }) => {
         </h2>
         <div className="flex gap-3">
             {isMetaLoading && <span className="text-xs text-blue-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Data</span>}
-            <button onClick={handleReset} className="text-xs text-gray-500 hover:text-white flex items-center gap-1" title="Làm mới form">
+            <button onClick={handleReset} className="text-xs text-gray-500 hover:text-white flex items-center gap-1 transition-all hover:shadow-lg active:scale-95" title="Làm mới form">
                 <RotateCcw className="w-3 h-3" /> Reset
             </button>
         </div>
@@ -245,8 +245,8 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onAddItems }) => {
                                         }}
                                     />
                                 </div>
-                                <button type="button" onClick={() => setIsEUDR(!isEUDR)} className={`px-2 rounded-lg border text-[10px] font-bold transition-all flex flex-col items-center justify-center min-w-[40px] ${isEUDR ? 'bg-green-600 border-green-500 text-white' : 'bg-slate-800 border-slate-600 text-gray-500'}`}>EUDR</button>
-                                <button type="button" onClick={() => setIsFSC(!isFSC)} className={`px-2 rounded-lg border text-[10px] font-bold transition-all flex flex-col items-center justify-center min-w-[40px] ${isFSC ? 'bg-green-600 border-green-500 text-white' : 'bg-slate-800 border-slate-600 text-gray-500'}`}>FSC</button>
+                                <button type="button" onClick={() => setIsEUDR(!isEUDR)} className={`px-2 rounded-lg border text-[10px] font-bold transition-all flex flex-col items-center justify-center min-w-[40px] hover:shadow-lg active:scale-95 ${isEUDR ? 'bg-green-600 border-green-500 text-white' : 'bg-slate-800 border-slate-600 text-gray-500'}`}>EUDR</button>
+                                <button type="button" onClick={() => setIsFSC(!isFSC)} className={`px-2 rounded-lg border text-[10px] font-bold transition-all flex flex-col items-center justify-center min-w-[40px] hover:shadow-lg active:scale-95 ${isFSC ? 'bg-green-600 border-green-500 text-white' : 'bg-slate-800 border-slate-600 text-gray-500'}`}>FSC</button>
                             </div>
                             {hasError && <p className="text-[10px] text-red-500">{errors.gsm?.message}</p>}
                         </div>

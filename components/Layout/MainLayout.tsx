@@ -55,7 +55,7 @@ export const MainLayout: React.FC = () => {
           className={`
             fixed z-40 w-8 h-8 flex items-center justify-center rounded-full 
             bg-brand-red text-white shadow-lg shadow-red-900/40 
-            border border-white/20 hover:bg-red-600 hover:scale-110 transition-all duration-300 ease-in-out
+            border border-white/20 hover:bg-red-600 hover:scale-110 transition-all duration-300 ease-in-out active:scale-95
           `}
           style={{ 
             left: isSidebarCollapsed ? '59px' : '235px', 

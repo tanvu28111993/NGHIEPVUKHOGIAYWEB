@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => onMenuChange(item.id)}
                 title={isCollapsed ? item.label : ''}
                 className={`
-                  w-full flex items-center rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden
+                  w-full flex items-center rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden active:scale-95
                   ${isCollapsed ? 'justify-center py-3 px-0' : 'gap-3 px-4 py-3'}
                   ${isActive 
                     ? 'bg-brand-red text-white shadow-lg shadow-red-900/30' 
@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button 
           onClick={logout}
           className={`
-            w-full flex items-center rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden
+            w-full flex items-center rounded-lg text-sm font-medium transition-all duration-200 group relative overflow-hidden active:scale-95
             bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-600 hover:text-white hover:border-red-500 shadow-lg shadow-red-900/10
             ${isCollapsed ? 'justify-center py-3 px-0' : 'gap-3 px-4 py-3'}
           `}

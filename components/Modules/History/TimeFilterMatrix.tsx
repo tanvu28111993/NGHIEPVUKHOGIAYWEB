@@ -94,7 +94,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
           <Calendar className="w-4 h-4" />
           <span>Bộ Lọc Thời Gian</span>
         </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+        <button onClick={onClose} className="text-gray-500 hover:text-white transition-all hover:shadow-lg active:scale-95">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -106,7 +106,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
             key={year}
             onClick={() => setSelectedYear(year)}
             className={`
-              flex-1 py-1.5 text-xs font-bold rounded transition-all duration-200 border
+              flex-1 py-1.5 text-xs font-bold rounded transition-all duration-200 border hover:shadow-lg active:scale-95
               ${selectedYear === year 
                 ? 'bg-blue-600 border-blue-500 text-white shadow-md' 
                 : 'bg-slate-800 border-slate-700 text-gray-500 hover:text-white hover:border-gray-500'}
@@ -130,7 +130,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
               <button 
                 onClick={() => toggleQuarter(q.months)}
                 className={`
-                  w-16 flex items-center justify-center rounded text-xs font-bold border transition-all
+                  w-16 flex items-center justify-center rounded text-xs font-bold border transition-all hover:shadow-lg active:scale-95
                   ${isQuarterFull 
                     ? 'bg-emerald-600/20 border-emerald-500 text-emerald-500' 
                     : isQuarterPartial 
@@ -151,7 +151,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
                       key={mIndex}
                       onClick={() => toggleMonth(mIndex)}
                       className={`
-                        py-1.5 text-xs font-medium rounded border transition-all duration-200 relative
+                        py-1.5 text-xs font-medium rounded border transition-all duration-200 relative hover:shadow-lg active:scale-95
                         ${isSelected 
                           ? 'bg-brand-red text-white border-brand-red shadow-sm' 
                           : 'bg-slate-800 border-slate-700 text-gray-400 hover:bg-slate-700 hover:text-white'}
@@ -171,7 +171,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
       <div className="mt-5 flex justify-end gap-2 border-t border-slate-800 pt-3">
         <button 
             onClick={onClose}
-            className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors"
+            className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-all hover:shadow-lg active:scale-95"
         >
             Hủy bỏ
         </button>

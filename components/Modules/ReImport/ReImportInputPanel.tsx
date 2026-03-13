@@ -38,7 +38,7 @@ export const ReImportInputPanel: React.FC<ReImportInputPanelProps> = ({
             <h2 className="text-sm font-bold text-white uppercase">NHẬP LIỆU NHẬP LẠI</h2>
          </div>
          <div className="flex gap-1">
-             <button onClick={onClear} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors" title="Xóa hết">
+             <button onClick={onClear} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-all hover:shadow-lg active:scale-95" title="Xóa hết">
                  <Eraser className="w-4 h-4" />
              </button>
          </div>
@@ -119,7 +119,7 @@ export const ReImportInputPanel: React.FC<ReImportInputPanelProps> = ({
 
                   <button 
                       onClick={() => onRemove(item.id)}
-                      className="w-8 flex justify-center text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                      className="w-8 flex justify-center text-gray-600 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 hover:shadow-lg active:scale-95"
                       tabIndex={-1}
                       title="Xóa dòng"
                   >

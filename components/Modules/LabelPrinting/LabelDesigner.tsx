@@ -195,7 +195,7 @@ export const LabelDesigner: React.FC = () => {
                 
                 <button 
                     onClick={handleSaveTemplate} 
-                    className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-green-500 transition-colors" 
+                    className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-green-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Lưu mẫu"
                 >
                     <Save className="w-5 h-5" />
@@ -203,7 +203,7 @@ export const LabelDesigner: React.FC = () => {
                 
                 {/* Saved Templates Dropdown */}
                 <div className="relative group">
-                    <button className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-blue-500 transition-colors">
+                    <button className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-blue-500 transition-colors hover:shadow-lg active:scale-95">
                         <FolderOpen className="w-5 h-5" />
                     </button>
                     {/* Dropdown Content */}
@@ -232,7 +232,7 @@ export const LabelDesigner: React.FC = () => {
             {/* File Actions */}
             <div className="flex gap-2">
                 <button 
-                    className="h-10 px-3 flex items-center justify-center gap-2 border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors" 
+                    className="h-10 px-3 flex items-center justify-center gap-2 border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Chọn phôi ảnh" 
                     onClick={() => fileInputRef.current?.click()}
                 >
@@ -242,7 +242,7 @@ export const LabelDesigner: React.FC = () => {
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors" 
+                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Xuất file JSON" 
                     onClick={handleExportTemplate}
                 >
@@ -250,7 +250,7 @@ export const LabelDesigner: React.FC = () => {
                 </button>
                 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors" 
+                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Nhập file JSON" 
                     onClick={() => templateInputRef.current?.click()}
                 >
@@ -261,7 +261,7 @@ export const LabelDesigner: React.FC = () => {
                 <div className="w-px h-10 bg-gray-700 mx-1"></div>
 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors" 
+                    className="h-10 w-10 flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors hover:shadow-lg active:scale-95" 
                     title="Reset về mặc định" 
                     onClick={resetTemplate}
                 >
@@ -276,7 +276,7 @@ export const LabelDesigner: React.FC = () => {
                 <div className="mb-4">
                      <button 
                         onClick={handleAddCustomText}
-                        className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-white flex items-center justify-center gap-2 py-3 transition-colors shadow-sm"
+                        className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-white flex items-center justify-center gap-2 py-3 transition-colors shadow-sm hover:shadow-lg active:scale-95"
                      >
                         <Plus className="w-5 h-5" /> Thêm Văn Bản Tùy Chỉnh
                      </button>
@@ -293,7 +293,7 @@ export const LabelDesigner: React.FC = () => {
                                 key={f.key}
                                 onClick={() => handleToggleField(f.key, f.label)}
                                 className={`
-                                    text-sm p-3 border rounded-lg transition-all text-left truncate flex items-center justify-between group
+                                    text-sm p-3 border rounded-lg transition-all text-left truncate flex items-center justify-between group hover:shadow-lg active:scale-95
                                     ${isUsed 
                                         ? 'bg-blue-900/20 border-blue-500 text-blue-300 shadow-sm' 
                                         : 'bg-slate-800 border-gray-700 text-gray-300 hover:bg-slate-700 hover:border-gray-500 hover:text-white'}
