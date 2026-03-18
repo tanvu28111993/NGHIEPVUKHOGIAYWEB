@@ -39,7 +39,11 @@ export const useInventoryFormFields = (mode: 'create' | 'edit') => {
         purpose: transform(metaData?.loaiNhap, true),
         packet: transform(metaData?.kienGiay, true),
         paper: transform(metaData?.loaiGiay, true),
-        supplier: transform(metaData?.ncc, false),
+        supplier: metaData?.ncc ? metaData.ncc.map(row => ({
+            value: String(row[2] || row[1] || row[0] || '').trim(), // Tên 2 (cột 3) -> Tên NCC (cột 2) -> Mã NCC (cột 1)
+            label: String(row[2] || row[1] || row[0] || '').trim(), // Tên 2 (cột 3) -> Tên NCC (cột 2) -> Mã NCC (cột 1)
+            code: String(row[0] || '').trim()             // Mã NCC (cột 1)
+        })) : [],
         manufacturer: transform(metaData?.nsx, false),
     };
   }, [metaData]);

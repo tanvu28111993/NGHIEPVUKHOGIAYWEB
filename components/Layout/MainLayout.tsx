@@ -1,5 +1,5 @@
 
-import React, { useState, useTransition, useMemo } from 'react';
+import React, { useState, useTransition, useMemo, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { ContentRouter } from './ContentRouter';
@@ -30,6 +30,17 @@ export const MainLayout: React.FC = () => {
       setCurrentMenu(id);
     });
   };
+
+  useEffect(() => {
+    const handleNavigate = (e: Event) => {
+      const customEvent = e as CustomEvent<MenuId>;
+      if (customEvent.detail) {
+        handleMenuChange(customEvent.detail);
+      }
+    };
+    window.addEventListener('app:navigate', handleNavigate);
+    return () => window.removeEventListener('app:navigate', handleNavigate);
+  }, []);
 
   return (
     <div className="h-screen bg-slate-950 text-white relative isolate flex flex-col overflow-hidden">

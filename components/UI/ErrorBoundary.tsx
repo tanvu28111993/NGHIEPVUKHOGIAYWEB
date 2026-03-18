@@ -59,7 +59,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           <p className="text-gray-400 text-center max-w-md mb-6 text-sm">
             Hệ thống gặp sự cố khi tải nội dung. Điều này không ảnh hưởng đến dữ liệu của bạn.
             <br />
-            <span className="text-red-400 italic mt-2 block text-xs font-mono bg-black/20 p-2 rounded border border-red-500/10">
+            <span className="text-red-400 italic mt-2 block text-xs font-mono bg-black/20 p-2 rounded-lg border border-red-500/10">
               {this.state.error?.message || "Unknown Error"}
             </span>
           </p>

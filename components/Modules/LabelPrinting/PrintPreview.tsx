@@ -29,6 +29,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
             <html>
               <head>
                 <title>In Tem Kho Giấy</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
                 <style>
                   @page { 
                     /* Thiết lập khổ giấy in theo đúng kích thước thiết kế */
@@ -37,7 +38,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                   }
                   body { 
                     margin: 0; 
-                    font-family: Arial, sans-serif; 
+                    font-family: 'Inter', sans-serif; 
                     background: white;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
@@ -107,7 +108,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
         <div className="p-4 bg-slate-900 border-b border-gray-800 flex justify-between items-center">
             <div className="flex gap-6 items-center">
                 {/* Hiển thị thông tin khổ giấy đang dùng (Read-only) */}
-                <div className="flex items-center gap-2 text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded border border-blue-500/30">
+                <div className="flex items-center gap-2 text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-lg border border-blue-500/30">
                     <LayoutTemplate className="w-4 h-4" />
                     <span className="text-sm font-bold">
                         Khổ thiết kế: {paperWidth} x {paperHeight} mm
@@ -122,7 +123,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                         type="number" min="1" max="10"
                         value={printConfig.columns}
                         onChange={(e) => setPrintConfig({ columns: Number(e.target.value) })}
-                        className="w-14 h-8 bg-slate-800 border border-gray-600 rounded px-2 text-center focus:border-blue-500 focus:outline-none"
+                        className="w-14 h-8 bg-slate-800 border border-gray-600 rounded-lg px-2 text-center focus:border-blue-500 focus:outline-none"
                     />
                 </div>
 
@@ -132,7 +133,7 @@ export const PrintPreview: React.FC<PrintPreviewProps> = ({ items, onClose }) =>
                         type="number" min="0"
                         value={printConfig.gap}
                         onChange={(e) => setPrintConfig({ gap: Number(e.target.value) })}
-                        className="w-14 h-8 bg-slate-800 border border-gray-600 rounded px-2 text-center focus:border-blue-500 focus:outline-none"
+                        className="w-14 h-8 bg-slate-800 border border-gray-600 rounded-lg px-2 text-center focus:border-blue-500 focus:outline-none"
                     />
                 </div>
             </div>

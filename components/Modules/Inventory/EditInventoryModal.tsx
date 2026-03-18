@@ -107,8 +107,8 @@ export const EditInventoryModal: React.FC<EditInventoryModalProps> = ({ item, is
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-900 border-gray-700 shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-slate-950">
           <div>
-            <h2 className="text-xl font-bold text-white">Chỉnh sửa thông tin cuộn giấy</h2>
-            <p className="text-sm text-gray-400">Cập nhật thông tin chi tiết cho SKU: <span className="text-brand-red font-mono font-bold">{item.sku}</span></p>
+            <h2 className="text-xl font-black text-white">Chỉnh sửa thông tin cuộn giấy</h2>
+            <p className="text-sm text-gray-400">Cập nhật thông tin chi tiết cho SKU: <span className="text-brand-red font-mono font-black">{item.sku}</span></p>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all hover:shadow-lg active:scale-95" title="Đóng (Esc)">
             <X className="w-6 h-6" />
@@ -190,7 +190,7 @@ export const EditInventoryModal: React.FC<EditInventoryModalProps> = ({ item, is
               </div>
             ))}
             
-            <div className="mt-4 p-3 bg-blue-900/10 rounded border border-blue-900/30 text-xs text-blue-300 text-center">
+            <div className="mt-4 p-3 bg-blue-900/10 rounded-lg border border-blue-900/30 text-xs text-blue-300 text-center">
               Cập nhật lần cuối bởi <strong>{item.importer}</strong> vào lúc {item.lastUpdated}
             </div>
           </form>

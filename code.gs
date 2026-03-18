@@ -3,6 +3,7 @@
 var ID_SHEET_DANG_NHAP = "1bJKBNvSlh-YWiu2ZcBJwdiYCBh9RxyKFjNMF8jnKJWU";
 var ID_SHEET_KHO = "1DSg_2nJoPkAfudCy4QnHBEbvKhwHm-j6Cd9CK_cwfkg";
 var ID_SHEET_DANHMUC = "1mn8QLCcgmCUKKckGXIyRcghDnPPtBAgjuGsVLJaDTF4"; // Sheet Danh mục mới
+var ID_SHEET_LICH = "11FIvb9hXe98TYOg6X4REjQyrgzdLOBfXOCM-gLIUVdA"; // Sheet Lịch dự kiến
 
 // External History Sheets
 var ID_SHEET_XUAT = "1ztt84ZUrGk1NlhjmbdAIm6tjlGHZBRDMPgOEQi24CUw";
@@ -67,6 +68,7 @@ function routeRequest(params) {
   if (action == 'getReImportRequests') return handleGetReImportRequests(); 
   if (action == 'getRecentExports') return handleGetRecentExports(); 
   if (action == 'checkVersion') return handleCheckVersion();
+  if (action == 'getExpectedSchedule') return handleGetExpectedSchedule(params);
   
   return responseJSON({ error: "Invalid action" });
 }
@@ -205,7 +207,7 @@ function handleGetMetaData() {
       loaiNhap: readSheet("LOAINHAP", 2),
       kienGiay: readSheet("KIENGIAY", 2),
       loaiGiay: readSheet("GIAY", 2),    
-      ncc: readSheet("NCC", 1),          
+      ncc: readSheet("NCC2", 3),          
       nsx: readSheet("NSX", 1)           
     };
 
@@ -465,6 +467,47 @@ function handleBatch(params) {
          }
 
          results.push({ id: cmd.id, success: true, processedCount: skusProcessed.length });
+
+      } else if (cmd.type === 'DELETE_SCHEDULE_BATCH') {
+         var idsToDelete = cmd.payload; // Array of IDs
+         if (!idsToDelete || !Array.isArray(idsToDelete) || idsToDelete.length === 0) {
+            results.push({ id: cmd.id, success: false, message: "Empty delete payload" });
+            return;
+         }
+
+         var ssLich = SpreadsheetApp.openById(ID_SHEET_LICH);
+         var sheetLich = ssLich.getSheetByName("LICH");
+         if (!sheetLich) {
+             results.push({ id: cmd.id, success: false, message: "Sheet LICH not found" });
+             return;
+         }
+
+         var lastRowLich = sheetLich.getLastRow();
+         if (lastRowLich > 1) {
+             var idValues = sheetLich.getRange(2, 1, lastRowLich - 1, 1).getValues();
+             var rowsToDelete = [];
+             
+             for (var i = 0; i < idValues.length; i++) {
+                 var rawStr = String(idValues[i][0]).trim();
+                 if (!rawStr) continue;
+                 
+                 var rowParts = rawStr.split('|');
+                 var actualId = String(rowParts[0]).trim();
+                 
+                 if (actualId && idsToDelete.indexOf(actualId) !== -1) {
+                     rowsToDelete.push(i + 2);
+                 }
+             }
+
+             if (rowsToDelete.length > 0) {
+                 rowsToDelete.sort(function(a, b) { return b - a; });
+                 rowsToDelete.forEach(function(rowIndex) {
+                     sheetLich.deleteRow(rowIndex);
+                 });
+             }
+         }
+
+         results.push({ id: cmd.id, success: true, processedCount: idsToDelete.length });
 
       } else {
          results.push({ id: cmd.id, success: true, message: "No-op" });
@@ -763,6 +806,115 @@ function handleGetInventory(params) {
     data: optimizedData,
     cached: isFromCache 
   });
+}
+
+function handleGetExpectedSchedule(params) {
+  try {
+    var ss = SpreadsheetApp.openById(ID_SHEET_LICH);
+    var sheet = ss.getSheetByName("LICH");
+    if (!sheet) {
+        return responseJSON({ success: false, message: "Không tìm thấy Sheet 'LICH'" });
+    }
+
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+        return responseJSON({ success: true, data: [] });
+    }
+
+    var data = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var todayTime = today.getTime();
+
+    var items = [];
+    for (var i = 0; i < data.length; i++) {
+        var rawStr = String(data[i][0] || "").trim();
+        if (!rawStr) continue;
+
+        var row = rawStr.split('|');
+        var id = String(row[0] || "").trim();
+        if (!id) continue;
+
+        var expectedDateStr = String(row[18] || "").trim();
+        var statusText = "";
+        var statusColor = "text-gray-300 font-bold";
+
+        if (id.indexOf("LVTS-") === 0) {
+            statusColor = "text-[#DA291C] font-black";
+        }
+        
+        var expDate = null;
+        if (expectedDateStr) {
+            if (expectedDateStr.indexOf('/') !== -1) {
+                // Try DD/MM/YYYY
+                var parts = expectedDateStr.split('/');
+                if (parts.length === 3) {
+                    var d = new Date(parts[2] + '-' + parts[1] + '-' + parts[0]);
+                    if (!isNaN(d.getTime())) {
+                        expDate = d.getTime();
+                    }
+                }
+            }
+            
+            if (!expDate) {
+                // Try YYYY-MM-DD or other formats
+                var d = new Date(expectedDateStr);
+                if (!isNaN(d.getTime())) {
+                    expDate = d.getTime();
+                }
+            }
+        }
+        
+        if (expDate) {
+            var d = new Date(expDate);
+            d.setHours(0, 0, 0, 0);
+            var diffTime = d.getTime() - todayTime;
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                statusText = "Quá hạn";
+                statusColor = "text-[#FF8C00] font-black";
+            } else if (diffDays >= 0 && diffDays <= 4) {
+                statusText = "Sắp về";
+                statusColor = "text-[#bf00ff] font-black";
+            } else {
+                statusText = "Đang về";
+                statusColor = "text-[#00FF00] font-black";
+            }
+        }
+
+        items.push({
+            id: id,
+            purchaseOrder: String(row[1] || ""),
+            materialType: String(row[2] || ""),
+            supplierCode: String(row[3] || ""),
+            supplierName: String(row[4] || ""),
+            materialCode: String(row[5] || ""),
+            materialName: String(row[6] || ""),
+            orderCustomer: String(row[7] || ""),
+            packetType: String(row[8] || ""),
+            paperType: String(row[9] || ""),
+            manufacturer: String(row[10] || ""),
+            purchaseDate: String(row[11] || ""),
+            gsm: String(row[12] || ""),
+            rollWidth: String(row[13] || ""),
+            length: Number(row[14]) || 0,
+            width: Number(row[15]) || 0,
+            quantity: Number(row[16]) || 0,
+            unit: String(row[17] || ""),
+            expectedDate: expectedDateStr,
+            importer: String(row[19] || ""),
+            lastUpdated: String(row[20] || ""),
+            status: statusText,
+            statusColor: statusColor
+        });
+    }
+
+    return responseJSON({ success: true, data: items });
+  } catch (err) {
+    return responseJSON({ success: false, message: err.message });
+  }
 }
 
 function responseJSON(data) {

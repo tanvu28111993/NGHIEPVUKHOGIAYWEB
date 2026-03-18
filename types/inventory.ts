@@ -1,4 +1,30 @@
 
+export interface ExpectedScheduleItem {
+  id: string;
+  materialType: string;
+  purchaseDate: string;
+  purchaseOrder: string;
+  supplierCode: string;
+  supplierName: string;
+  materialCode?: string;
+  materialName: string;
+  orderCustomer: string;
+  packetType: string;
+  paperType: string;
+  manufacturer: string;
+  gsm: string;
+  rollWidth: string;
+  length: number;
+  width: number;
+  quantity: number;
+  unit: string;
+  expectedDate: string;
+  importer: string;
+  lastUpdated: string;
+  status: string;
+  statusColor?: string;
+}
+
 export interface InventoryItem {
   sku: string;           
   purpose: string;       

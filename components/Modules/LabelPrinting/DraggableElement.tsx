@@ -106,7 +106,7 @@ export const DraggableElement: React.FC<Props> = ({ element, containerWidth, con
     >
         {/* Helper Toolbar only visible when selected */}
         {isSelected && (
-            <div className="absolute -top-6 left-0 bg-brand-red text-white text-[10px] px-1 rounded-t flex items-center gap-2 pointer-events-auto z-50">
+            <div className="absolute -top-6 left-0 bg-brand-red text-white text-[10px] px-1 rounded-t-lg flex items-center gap-2 pointer-events-auto z-50">
                 <span>{element.width.toFixed(0)}x{element.height.toFixed(0)}</span>
                 <button onClick={(e) => { e.stopPropagation(); removeElement(element.id); }} className="hover:text-black p-0.5 transition-all hover:shadow-lg active:scale-95">
                     <Trash2 className="w-3 h-3" />

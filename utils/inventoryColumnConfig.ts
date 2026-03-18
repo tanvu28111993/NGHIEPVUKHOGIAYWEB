@@ -12,8 +12,8 @@ const formatNumber = (val: any) => {
 
 // Hàm helper lấy màu sắc dựa trên loại giao dịch (Ưu tiên cao nhất)
 export const getTransactionStyle = (item: InventoryItem) => {
-     if (item.transactionType === 'EXPORT') return 'text-orange-500 font-bold';
-     if (item.transactionType === 'IMPORT') return 'text-green-500 font-bold';
+     if (item.transactionType === 'EXPORT') return 'text-[#FF8C00] font-black';
+     if (item.transactionType === 'IMPORT') return 'text-[#bf00ff] font-black';
      return '';
 };
 
@@ -25,9 +25,9 @@ export const INVENTORY_COLUMNS: ColumnConfig<InventoryItem>[] = [
              const transStyle = getTransactionStyle(item);
              if (transStyle) return transStyle;
              
-             if (isPending) return 'text-green-500 font-bold';
-             if (isOdd) return 'text-orange-500 font-bold';
-             return 'text-blue-400 font-bold group-hover:text-blue-300';
+             if (isPending) return 'text-[#bf00ff] font-black';
+             if (isOdd) return 'text-[#FF8C00] font-black';
+             return 'text-blue-400 font-black group-hover:text-blue-300';
         }
     },
     { header: 'MỤC ĐÍCH', accessor: 'purpose', width: 130 },
@@ -59,9 +59,9 @@ export const INVENTORY_COLUMNS: ColumnConfig<InventoryItem>[] = [
              const transStyle = getTransactionStyle(item);
              if (transStyle) return transStyle;
              
-             if (isPending) return 'text-green-500 font-bold';
-             if (isOdd) return 'text-orange-500 font-bold';
-             return 'text-white font-bold';
+             if (isPending) return 'text-[#bf00ff] font-black';
+             if (isOdd) return 'text-[#FF8C00] font-black';
+             return 'text-white font-black';
         }
     },
     { header: 'ĐƠN HÀNG/ KHÁCH HÀNG', accessor: 'orderCustomer', width: 250 },
@@ -72,9 +72,9 @@ export const INVENTORY_COLUMNS: ColumnConfig<InventoryItem>[] = [
              const transStyle = getTransactionStyle(item);
              if (transStyle) return transStyle;
 
-             if (isPending) return 'text-green-500 font-bold';
-             if (isOdd) return 'text-orange-500 font-bold';
-             return 'text-brand-red font-bold group-hover:text-red-400';
+             if (isPending) return 'text-[#bf00ff] font-black';
+             if (isOdd) return 'text-[#FF8C00] font-black';
+             return 'text-[#DA291C] font-black group-hover:text-red-400';
         }
     },
     { header: 'VẬT TƯ CHỜ XUẤT', accessor: 'pendingOut', width: 200 },
@@ -85,7 +85,7 @@ export const INVENTORY_COLUMNS: ColumnConfig<InventoryItem>[] = [
 // Hàm lấy style mặc định nếu cột không định nghĩa style riêng
 export const getDefaultCellStyle = (isOddLot: boolean, isPendingOut: boolean) => {
     // Logic mặc định cho Tồn Kho
-    if (isPendingOut) return 'text-green-500 font-bold';
-    if (isOddLot) return 'text-orange-500 font-bold';
-    return 'text-gray-300 font-bold';
+    if (isPendingOut) return 'text-[#bf00ff] font-black';
+    if (isOddLot) return 'text-[#FF8C00] font-black';
+    return 'text-gray-300 font-black';
 };

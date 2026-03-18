@@ -45,7 +45,7 @@ export const ImportManager: React.FC = () => {
                 <Button 
                     onClick={saveToInventory}
                     disabled={pendingImports.length === 0}
-                    className="bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-900/20 border border-green-500/50 flex items-center gap-2 px-6"
+                    className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-900/20 border border-orange-500/50 flex items-center gap-2 px-6"
                 >
                     <Save className="w-4 h-4" />
                     LƯU KHO

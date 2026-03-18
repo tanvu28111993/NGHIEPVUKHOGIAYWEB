@@ -109,7 +109,7 @@ export const LoginScreen: React.FC = () => {
               </div>
 
               {error && (
-                <div className="p-3 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center justify-center">
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center justify-center">
                   {error}
                 </div>
               )}

@@ -7,7 +7,7 @@ import { Select } from '../../UI/Select';
 import { Badge } from '../../UI/Badge';
 import { GLOBAL_EVENTS } from '../../../hooks/useGlobalShortcuts';
 import { FilterState } from '../../../hooks/useInventoryFilter';
-import { formatNumberToVN } from '../../../utils/formatting';
+import { formatNumberToVN, formatTotalToVN } from '../../../utils/formatting';
 
 interface InventoryToolbarProps {
   totalWeight: number;
@@ -66,8 +66,8 @@ export const InventoryToolbar: React.FC<InventoryToolbarProps> = ({
           {/* Stats Section */}
           <div className="flex items-center gap-2 mr-auto border-r border-gray-800 pr-4">
               <span className="text-sm font-medium text-gray-400">Tổng:</span>
-              <span className="text-xl font-bold text-green-500">
-                  {formatNumberToVN(totalWeight)} Tấn
+              <span className="text-xl font-black text-[#bf00ff]">
+                  {formatTotalToVN(totalWeight)} Tấn
               </span>
               <span className="text-xs text-gray-500 ml-2">({totalRows} Dòng)</span>
               {(isPending || isSyncing) && <Loader2 className="w-4 h-4 text-blue-500 animate-spin ml-2" />}
@@ -81,7 +81,7 @@ export const InventoryToolbar: React.FC<InventoryToolbarProps> = ({
                 onClick={onPrint}
                 disabled={selectedCount === 0}
                 className={`
-                    h-10 px-4 flex items-center gap-2 rounded-lg border transition-all text-sm font-bold shadow-lg whitespace-nowrap active:scale-95
+                    h-10 px-4 flex items-center gap-2 rounded-lg border transition-all text-sm font-black shadow-lg whitespace-nowrap active:scale-95
                     ${selectedCount > 0 
                         ? 'bg-purple-600 border-purple-500 text-white hover:bg-purple-700 shadow-purple-900/20' 
                         : 'bg-slate-800 border-slate-600 text-gray-500 cursor-not-allowed'}
@@ -108,7 +108,7 @@ export const InventoryToolbar: React.FC<InventoryToolbarProps> = ({
               
               <button 
                 onClick={() => onUpdateFilter('showPendingOut', !filterState.showPendingOut)} 
-                className={`h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95 ${filterState.showPendingOut ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-slate-800 border-slate-600 text-gray-400 hover:text-white hover:border-gray-500'}`}
+                className={`h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95 ${filterState.showPendingOut ? 'bg-[#bf00ff]/10 border-[#bf00ff] text-[#bf00ff]' : 'bg-slate-800 border-slate-600 text-gray-400 hover:text-white hover:border-gray-500'}`}
               >
                   <Hourglass className="w-4 h-4" /><span className="hidden md:inline">Chờ Xuất</span>
               </button>

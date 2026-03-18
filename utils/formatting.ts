@@ -8,6 +8,14 @@ export const formatDate = (date: Date): string => {
   return `${day}/${month}/${year}`;
 };
 
+// Helper: Format string date (YYYY-MM-DD) to VN format (DD/MM/YYYY)
+export const formatStringDateToVN = (dateStr: string | undefined | null): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+  return formatDate(date);
+};
+
 // Helper: Định dạng ngày giờ chuẩn hệ thống (dd/MM/yyyy HH:mm:ss)
 export const formatDateTime = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0');
@@ -61,6 +69,25 @@ export const formatNumberToVN = (value: number | string | undefined): string => 
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
   return decimalPart ? `${formattedInteger},${decimalPart}` : formattedInteger;
+};
+
+// Helper: Định dạng số tổng (VD: 1200.5 -> 1.200,50) đảm bảo 2 chữ số thập phân
+export const formatTotalToVN = (value: number | string | undefined): string => {
+  if (value === undefined || value === null || value === '') return '0,00';
+  
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return '0,00';
+
+  // Sử dụng toFixed(2) để lấy đúng 2 chữ số thập phân
+  const fixedStr = num.toFixed(2);
+  const parts = fixedStr.split('.');
+  const integerPart = parts[0];
+  const decimalPart = parts[1];
+
+  // Định dạng phần nguyên: thêm dấu chấm phân cách hàng nghìn
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  return `${formattedInteger},${decimalPart}`;
 };
 
 // Helper: Chuyển chuỗi VN (1.200,5) về số chuẩn (1200.5) để lưu DB/Tính toán

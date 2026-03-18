@@ -1,40 +1,29 @@
-
 import React from 'react';
-import { InventoryItem, ColumnConfig } from '../../../types';
-import { getTransactionStyle } from '../../../utils/inventoryColumnConfig';
+import { ExpectedScheduleItem, ColumnConfig } from '../../../types';
 
-export interface InventoryRowProps {
-    item: InventoryItem;
+export interface ExpectedScheduleRowProps {
+    item: ExpectedScheduleItem;
     index: number;
-    columns: ColumnConfig<InventoryItem>[];
+    columns: ColumnConfig<ExpectedScheduleItem>[];
     colWidths: Record<string, number>;
     searchColumn: string;
-    showOddLots: boolean;
-    showPendingOut: boolean;
     rowHeight: number;
     isActive?: boolean;
-    onRowDoubleClick?: (item: InventoryItem) => void;
-    getDefaultStyle?: (isOddLot: boolean, isPendingOut: boolean) => string;
-    // Selection
+    onRowDoubleClick?: (item: ExpectedScheduleItem) => void;
+    getDefaultStyle?: (item: ExpectedScheduleItem) => string;
     isSelected?: boolean;
-    onSelectRow?: (sku: string) => void;
+    onSelectRow?: (id: string) => void;
 }
 
-export const InventoryRow = React.memo(({ 
-    item, index, columns, colWidths, searchColumn, showOddLots, showPendingOut, rowHeight, isActive = false, onRowDoubleClick, getDefaultStyle,
+export const ExpectedScheduleRow = React.memo(({ 
+    item, index, columns, colWidths, searchColumn, rowHeight, isActive = false, onRowDoubleClick, getDefaultStyle,
     isSelected, onSelectRow
-}: InventoryRowProps) => {
-    const isOddLotRow = showOddLots && index < 10;
-    const hasPendingOut = item.pendingOut && String(item.pendingOut).trim() !== '';
-    const isPendingOutRow = showPendingOut && hasPendingOut;
-
-    const transactionStyle = getTransactionStyle(item);
+}: ExpectedScheduleRowProps) => {
 
     return (
         <tr 
             style={{ 
                 height: rowHeight,
-                // CSS Optimization: Giúp trình duyệt không tính toán layout cho row bị ẩn
                 contentVisibility: 'auto', 
                 containIntrinsicSize: `${rowHeight}px` 
             }}
@@ -47,18 +36,17 @@ export const InventoryRow = React.memo(({
             ${isActive 
                 ? 'bg-blue-600/30 border-l-blue-400 ring-1 ring-inset ring-blue-500/50 z-10 relative' 
                 : isSelected
-                    ? 'bg-purple-900/30 border-l-purple-500' // Highlight selected row
+                    ? 'bg-purple-900/30 border-l-purple-500' 
                     : `border-transparent hover:bg-blue-600/20 hover:border-l-blue-500 ${index % 2 === 0 ? '' : 'bg-slate-800/30'}`
             }
             `}
         >
-            {/* Checkbox Cell */}
             {onSelectRow && (
                 <td className="px-2 py-0 border-r border-gray-800 sticky left-0 z-10 bg-inherit text-center" onClick={(e) => e.stopPropagation()}>
                     <input 
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => onSelectRow(item.sku)}
+                        onChange={() => onSelectRow(item.id)}
                         className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500 bg-slate-800 cursor-pointer accent-purple-600"
                     />
                 </td>
@@ -66,18 +54,35 @@ export const InventoryRow = React.memo(({
 
             {columns.map((col, colIndex) => {
                 const accessor = col.accessor as string;
-                const value = item[col.accessor];
+                const value = item[col.accessor as keyof ExpectedScheduleItem];
                 const isSelectedColumn = searchColumn === accessor;
 
                 let cellClass = '';
-                if (transactionStyle) {
-                    cellClass = transactionStyle;
-                } else if (col.getCellStyle) {
-                    cellClass = col.getCellStyle(item, isOddLotRow, isPendingOutRow);
+                if (item.id && item.id.startsWith('LVTS-')) {
+                    cellClass = 'text-[#DA291C] font-black';
+                } else if (item.status === 'Quá hạn') {
+                    cellClass = 'text-[#FF8C00] font-black';
+                } else if (item.status === 'Sắp về') {
+                    cellClass = 'text-[#bf00ff] font-black';
+                } else if (item.status === 'Đang về') {
+                    cellClass = 'text-[#00FF00] font-black';
+                } else if (item.statusColor) {
+                    cellClass = item.statusColor.replace(/font-bold/g, 'font-black');
                 } else if (getDefaultStyle) {
-                    cellClass = getDefaultStyle(isOddLotRow, isPendingOutRow);
+                    cellClass = getDefaultStyle(item).replace(/font-bold/g, 'font-black');
                 } else {
                     cellClass = 'text-gray-300 font-black';
+                }
+
+                // Override specific color for status column if it has a status
+                if (accessor === 'status') {
+                    if (item.status === 'Quá hạn') {
+                        cellClass = 'text-[#FF8C00] font-black';
+                    } else if (item.status === 'Sắp về') {
+                        cellClass = 'text-[#bf00ff] font-black';
+                    } else if (item.status === 'Đang về') {
+                        cellClass = 'text-[#00FF00] font-black';
+                    }
                 }
 
                 let displayValue = value !== null && value !== undefined ? String(value) : "";
@@ -91,14 +96,14 @@ export const InventoryRow = React.memo(({
                     role="gridcell"
                     style={{ width: colWidths[accessor], minWidth: colWidths[accessor] }}
                     className={`
-                        px-4 py-0 text-sm whitespace-nowrap border-r border-gray-800 group-hover:border-gray-700 overflow-hidden font-black
+                        px-4 py-0 text-sm whitespace-nowrap border-r border-gray-800 group-hover:border-gray-700 overflow-hidden font-black font-sans
                         ${cellClass}
                         ${isSelectedColumn && !isActive ? 'bg-brand-red/10' : ''}
                         ${col.isNumeric ? 'text-right' : 'text-left'}
                     `}
                     >
                     <div className="flex items-center h-full w-full">
-                        <span className={`w-full truncate font-black ${col.isNumeric ? 'text-right' : 'text-left'}`}>
+                        <span className={`w-full truncate font-black font-sans ${col.isNumeric ? 'text-right' : 'text-left'}`}>
                         {displayValue}
                         </span>
                     </div>

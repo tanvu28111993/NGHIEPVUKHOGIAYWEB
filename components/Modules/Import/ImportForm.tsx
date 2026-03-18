@@ -2,17 +2,18 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InventoryItem } from '../../../types';
+import { InventoryItem, ExpectedScheduleItem } from '../../../types';
 import { Button } from '../../UI/Button';
 import { Input } from '../../UI/Input';
 import { SearchableSelect } from '../../UI/SearchableSelect';
 import { Card } from '../../UI/Card';
-import { Copy, PlusCircle, RotateCcw, Loader2 } from 'lucide-react';
-import { parseVNToNumber, processNumberInput, formatDateTime, formatDate } from '../../../utils/formatting';
+import { Copy, PlusCircle, RotateCcw, Loader2, Download } from 'lucide-react';
+import { parseVNToNumber, processNumberInput, formatDateTime, formatDate, formatNumberToVN } from '../../../utils/formatting';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useToast } from '../../../contexts/ToastContext';
 import { useInventoryFormFields } from '../../../hooks/useInventoryFormFields';
 import { inventoryItemSchema, InventoryFormValues } from '../../../utils/validation';
+import { consumeNavigationState } from '../../../utils/navigation';
 
 interface ImportFormProps {
   onAddItems: (
@@ -63,6 +64,79 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onAddItems }) => {
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: INITIAL_FORM_STATE
   });
+
+  const pendingNavState = useRef<any>(null);
+
+  // Handle navigation state from Expected Schedule
+  useEffect(() => {
+    const navState = consumeNavigationState();
+    if (navState) {
+        pendingNavState.current = navState;
+    }
+
+    if (pendingNavState.current && pendingNavState.current.selectedItems && pendingNavState.current.selectedItems.length > 0) {
+      // Wait for options to load before applying
+      if (isMetaLoading) return;
+
+      const item = pendingNavState.current.selectedItems[0] as ExpectedScheduleItem;
+      
+      // Map ExpectedScheduleItem to InventoryFormValues
+      // Try to find matching options for selects
+      const matchedPaperType = options.paper.find(o => o.label.toLowerCase() === item.paperType?.toLowerCase() || o.value === item.paperType)?.value || '';
+      const matchedPacketCode = options.packet.find(o => o.label.toLowerCase() === item.packetType?.toLowerCase() || o.value === item.packetType)?.value || '';
+      const matchedSupplier = options.supplier.find(o => 
+        o.code && item.supplierCode && o.code.trim().toLowerCase() === item.supplierCode.trim().toLowerCase()
+      )?.value || item.supplierName || '';
+      
+      let rawGsm = item.gsm ? String(item.gsm).replace(/_EUDR|_FSC/g, '') : '';
+      let gsmNum = rawGsm.includes(',') ? parseVNToNumber(rawGsm) : parseFloat(rawGsm);
+      let gsmValue = rawGsm ? formatNumberToVN(rawGsm) : '';
+      
+      const isEudr = item.gsm ? item.gsm.includes('_EUDR') : false;
+      const isFsc = item.gsm ? item.gsm.includes('_FSC') : false;
+      
+      let lengthVal = item.length ? formatNumberToVN(item.length) : '';
+      let widthVal = item.width ? formatNumberToVN(item.width) : '';
+      let quantityVal = item.quantity ? formatNumberToVN(item.quantity) : '1';
+
+      // Special logic for "Cuộn Lô"
+      const isCuonLo = item.packetType?.toLowerCase() === 'cuộn lô' || matchedPacketCode?.toLowerCase() === 'cuộn lô';
+      if (isCuonLo) {
+        if (!isNaN(gsmNum) && rawGsm !== '') {
+            gsmValue = formatNumberToVN(gsmNum * 1000);
+        }
+        lengthVal = item.rollWidth ? formatNumberToVN(item.rollWidth) : '';
+        widthVal = '0';
+        quantityVal = '1';
+      } else {
+        const parsedRollWidth = item.rollWidth ? (item.rollWidth.includes(',') ? parseVNToNumber(item.rollWidth) : parseFloat(item.rollWidth)) : 0;
+        lengthVal = item.length ? formatNumberToVN(item.length * 100) : (parsedRollWidth ? formatNumberToVN(parsedRollWidth * 100) : '');
+        widthVal = item.width ? formatNumberToVN(item.width * 100) : '';
+      }
+      
+      setIsEUDR(isEudr);
+      setIsFSC(isFsc);
+      
+      reset({
+        ...INITIAL_FORM_STATE,
+        paperType: matchedPaperType || item.paperType || '',
+        packetCode: matchedPacketCode || item.packetType || '',
+        gsm: gsmValue,
+        supplier: matchedSupplier || item.supplierName || '',
+        manufacturer: item.manufacturer || '',
+        length: lengthVal,
+        width: widthVal,
+        quantity: quantityVal,
+        orderCustomer: item.purchaseOrder ? `${item.purchaseOrder} ${item.orderCustomer || ''}`.trim() : (item.orderCustomer || ''),
+        materialCode: item.materialCode || '',
+      });
+      
+      addToast(`Đã điền thông tin từ Lịch dự kiến`, 'success');
+      
+      // Clear the pending state so it doesn't re-apply
+      pendingNavState.current = null;
+    }
+  }, [options, isMetaLoading, reset, addToast]);
 
   // --- Auto-Calculate Weight Logic ---
   const watchedValues = useWatch({
@@ -197,6 +271,9 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onAddItems }) => {
             {isMetaLoading && <span className="text-xs text-blue-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Data</span>}
             <button onClick={handleReset} className="text-xs text-gray-500 hover:text-white flex items-center gap-1 transition-all hover:shadow-lg active:scale-95" title="Làm mới form">
                 <RotateCcw className="w-3 h-3" /> Reset
+            </button>
+            <button type="button" onClick={() => {}} className="text-xs text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all hover:shadow-lg active:scale-95" title="Lấy Đơn Hàng Mua">
+                <Download className="w-3 h-3" /> Lấy DHM
             </button>
         </div>
       </div>

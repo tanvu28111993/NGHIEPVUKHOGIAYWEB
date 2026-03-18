@@ -1,22 +1,20 @@
-
 import React from 'react';
-import { InventoryItem, ColumnConfig } from '../../../types';
+import { ExpectedScheduleItem, ColumnConfig } from '../../../types';
 import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
-interface InventoryTableHeaderProps {
-  columns: ColumnConfig<InventoryItem>[];
+interface ExpectedScheduleTableHeaderProps {
+  columns: ColumnConfig<ExpectedScheduleItem>[];
   colWidths: Record<string, number>;
-  sortConfig: { key: keyof InventoryItem | null; direction: 'asc' | 'desc' };
-  onSort: (key: keyof InventoryItem) => void;
+  sortConfig: { key: keyof ExpectedScheduleItem | null; direction: 'asc' | 'desc' };
+  onSort: (key: keyof ExpectedScheduleItem) => void;
   searchColumn: string;
   onResizeMouseDown: (e: React.MouseEvent, accessor: string) => void;
-  // Selection
   allSelected?: boolean;
   onSelectAll?: (isSelected: boolean) => void;
   showCheckbox?: boolean;
 }
 
-export const InventoryTableHeader: React.FC<InventoryTableHeaderProps> = React.memo(({
+export const ExpectedScheduleTableHeader: React.FC<ExpectedScheduleTableHeaderProps> = React.memo(({
   columns,
   colWidths,
   sortConfig,
@@ -28,9 +26,8 @@ export const InventoryTableHeader: React.FC<InventoryTableHeaderProps> = React.m
   showCheckbox
 }) => {
   return (
-    <thead className="bg-slate-950 text-white text-base uppercase font-black sticky top-0 z-20 shadow-sm ring-1 ring-white/5">
+    <thead className="bg-slate-950 text-white text-base uppercase font-black font-sans sticky top-0 z-20 shadow-sm ring-1 ring-white/5">
       <tr>
-        {/* Checkbox Column */}
         {showCheckbox && (
             <th className="px-2 py-4 border-b border-r border-gray-800 bg-slate-950 w-[40px] sticky left-0 z-30 text-center">
                 <input 
@@ -52,7 +49,7 @@ export const InventoryTableHeader: React.FC<InventoryTableHeaderProps> = React.m
               key={index}
               style={{ width: width, minWidth: width }}
               className={`
-                relative px-4 py-4 whitespace-nowrap border-b border-r border-gray-800 bg-slate-950 transition-colors duration-200 select-none group
+                relative px-4 py-4 whitespace-nowrap border-b border-r border-gray-800 bg-slate-950 transition-colors duration-200 select-none group font-sans
                 ${searchColumn === accessor ? 'text-brand-red bg-slate-900' : ''}
               `}
             >

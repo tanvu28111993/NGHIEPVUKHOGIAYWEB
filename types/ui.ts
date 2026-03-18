@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-export type MenuId = 'OVERVIEW' | 'LOCATIONS' | 'INVENTORY' | 'IMPORT' | 'EXPORT' | 'RE_IMPORT' | 'HISTORY';
+export type MenuId = 'OVERVIEW' | 'LOCATIONS' | 'INVENTORY' | 'IMPORT' | 'EXPORT' | 'RE_IMPORT' | 'HISTORY' | 'EXPECTED_SCHEDULE';
 
 export interface MenuItem {
   id: MenuId;

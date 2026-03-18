@@ -196,7 +196,7 @@ export const SearchableSelect = forwardRef<HTMLInputElement, SearchableSelectPro
                   <span className="truncate font-medium flex-1 mr-2">{option.label}</span>
                   {option.code && (
                     <span className={`
-                        font-mono text-xs px-1.5 py-0.5 rounded border
+                        font-mono text-xs px-1.5 py-0.5 rounded-lg border
                         ${index === highlightedIndex 
                             ? 'bg-white/20 border-white/30 text-white' 
                             : 'bg-slate-950 border-gray-700 text-gray-500 group-hover:text-gray-400'}

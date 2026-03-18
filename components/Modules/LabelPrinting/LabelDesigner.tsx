@@ -153,7 +153,7 @@ export const LabelDesigner: React.FC = () => {
             <div className="flex items-center gap-2">
                 <FileText className="w-6 h-6 text-blue-500" />
                 <select 
-                    className="bg-slate-800 text-white text-sm border border-gray-600 rounded px-3 py-2 focus:border-brand-red focus:outline-none hover:bg-slate-700 transition-colors cursor-pointer"
+                    className="bg-slate-800 text-white text-sm border border-gray-600 rounded-lg px-3 py-2 focus:border-brand-red focus:outline-none hover:bg-slate-700 transition-colors cursor-pointer"
                     onChange={(e) => applyPreset(e.target.value)}
                     defaultValue=""
                 >
@@ -195,7 +195,7 @@ export const LabelDesigner: React.FC = () => {
                 
                 <button 
                     onClick={handleSaveTemplate} 
-                    className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-green-500 transition-colors hover:shadow-lg active:scale-95" 
+                    className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-slate-700 text-gray-400 hover:text-green-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Lưu mẫu"
                 >
                     <Save className="w-5 h-5" />
@@ -203,7 +203,7 @@ export const LabelDesigner: React.FC = () => {
                 
                 {/* Saved Templates Dropdown */}
                 <div className="relative group">
-                    <button className="h-9 w-9 flex items-center justify-center rounded hover:bg-slate-700 text-gray-400 hover:text-blue-500 transition-colors hover:shadow-lg active:scale-95">
+                    <button className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-slate-700 text-gray-400 hover:text-blue-500 transition-colors hover:shadow-lg active:scale-95">
                         <FolderOpen className="w-5 h-5" />
                     </button>
                     {/* Dropdown Content */}
@@ -215,7 +215,7 @@ export const LabelDesigner: React.FC = () => {
                             <div className="text-xs text-gray-500 p-4 text-center italic">Chưa có mẫu nào được lưu</div>
                         )}
                         {savedTemplates.map(t => (
-                            <div key={t.name} className="flex justify-between items-center p-2 hover:bg-white/5 rounded cursor-pointer group/item" onClick={() => handleLoadSavedTemplate(t.name)}>
+                            <div key={t.name} className="flex justify-between items-center p-2 hover:bg-white/5 rounded-lg cursor-pointer group/item" onClick={() => handleLoadSavedTemplate(t.name)}>
                                 <span className="text-sm text-gray-300 group-hover/item:text-white truncate max-w-[180px]">{t.name}</span>
                                 <Trash2 
                                     className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors opacity-0 group-hover/item:opacity-100" 
@@ -232,7 +232,7 @@ export const LabelDesigner: React.FC = () => {
             {/* File Actions */}
             <div className="flex gap-2">
                 <button 
-                    className="h-10 px-3 flex items-center justify-center gap-2 border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
+                    className="h-10 px-3 flex items-center justify-center gap-2 border border-slate-600 rounded-lg bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Chọn phôi ảnh" 
                     onClick={() => fileInputRef.current?.click()}
                 >
@@ -242,7 +242,7 @@ export const LabelDesigner: React.FC = () => {
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
+                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded-lg bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Xuất file JSON" 
                     onClick={handleExportTemplate}
                 >
@@ -250,7 +250,7 @@ export const LabelDesigner: React.FC = () => {
                 </button>
                 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
+                    className="h-10 w-10 flex items-center justify-center border border-slate-600 rounded-lg bg-slate-800 text-gray-300 hover:text-white hover:border-gray-500 transition-colors hover:shadow-lg active:scale-95" 
                     title="Nhập file JSON" 
                     onClick={() => templateInputRef.current?.click()}
                 >
@@ -261,7 +261,7 @@ export const LabelDesigner: React.FC = () => {
                 <div className="w-px h-10 bg-gray-700 mx-1"></div>
 
                 <button 
-                    className="h-10 w-10 flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded transition-colors hover:shadow-lg active:scale-95" 
+                    className="h-10 w-10 flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors hover:shadow-lg active:scale-95" 
                     title="Reset về mặc định" 
                     onClick={resetTemplate}
                 >

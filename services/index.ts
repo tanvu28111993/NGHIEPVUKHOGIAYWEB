@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './expectedSchedule';
 export * from './history';
 export * from './http';
 export * from './idb';

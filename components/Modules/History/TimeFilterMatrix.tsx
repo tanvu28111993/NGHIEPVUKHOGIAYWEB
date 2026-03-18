@@ -90,7 +90,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
     <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-2xl w-[400px] animate-fade-in relative z-50">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-2">
-        <div className="flex items-center gap-2 text-brand-red font-bold text-sm uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-brand-red font-black text-sm uppercase tracking-wider">
           <Calendar className="w-4 h-4" />
           <span>Bộ Lọc Thời Gian</span>
         </div>
@@ -106,7 +106,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
             key={year}
             onClick={() => setSelectedYear(year)}
             className={`
-              flex-1 py-1.5 text-xs font-bold rounded transition-all duration-200 border hover:shadow-lg active:scale-95
+              flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200 border hover:shadow-lg active:scale-95
               ${selectedYear === year 
                 ? 'bg-blue-600 border-blue-500 text-white shadow-md' 
                 : 'bg-slate-800 border-slate-700 text-gray-500 hover:text-white hover:border-gray-500'}
@@ -130,11 +130,11 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
               <button 
                 onClick={() => toggleQuarter(q.months)}
                 className={`
-                  w-16 flex items-center justify-center rounded text-xs font-bold border transition-all hover:shadow-lg active:scale-95
+                  w-16 flex items-center justify-center rounded-lg text-xs font-black border transition-all hover:shadow-lg active:scale-95
                   ${isQuarterFull 
-                    ? 'bg-emerald-600/20 border-emerald-500 text-emerald-500' 
+                    ? 'bg-[#bf00ff]/20 border-[#bf00ff] text-[#bf00ff]' 
                     : isQuarterPartial 
-                        ? 'bg-emerald-600/10 border-emerald-500/50 text-emerald-400'
+                        ? 'bg-[#bf00ff]/10 border-[#bf00ff]/50 text-[#bf00ff]'
                         : 'bg-slate-800 border-slate-700 text-gray-500 hover:text-white'
                   }
                 `}
@@ -151,7 +151,7 @@ export const TimeFilterMatrix: React.FC<TimeFilterMatrixProps> = ({
                       key={mIndex}
                       onClick={() => toggleMonth(mIndex)}
                       className={`
-                        py-1.5 text-xs font-medium rounded border transition-all duration-200 relative hover:shadow-lg active:scale-95
+                        py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 relative hover:shadow-lg active:scale-95
                         ${isSelected 
                           ? 'bg-brand-red text-white border-brand-red shadow-sm' 
                           : 'bg-slate-800 border-slate-700 text-gray-400 hover:bg-slate-700 hover:text-white'}

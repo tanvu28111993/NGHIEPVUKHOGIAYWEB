@@ -6,7 +6,7 @@ import { TimeFilterMatrix } from './TimeFilterMatrix';
 import { Card } from '../../UI/Card';
 import { Input } from '../../UI/Input';
 import { Select } from '../../UI/Select';
-import { formatNumberToVN } from '../../../utils/formatting';
+import { formatNumberToVN, formatTotalToVN } from '../../../utils/formatting';
 
 interface HistoryToolbarProps {
   totalRows: number;
@@ -80,8 +80,8 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                  {/* 1. Stats */}
                  <div className="flex items-center gap-2 border-r border-gray-800 pr-4 min-w-[200px]">
                     <span className="text-sm font-medium text-gray-400">Tổng:</span>
-                    <span className="text-xl font-bold text-green-500">
-                        {formatNumberToVN(totalWeight)} Tấn
+                    <span className="text-xl font-black text-[#bf00ff]">
+                        {formatTotalToVN(totalWeight)} Tấn
                     </span>
                     <span className="text-xs text-gray-500 ml-2">({totalRows} cuộn)</span>
                     {isSyncing && <Loader2 className="w-4 h-4 text-blue-500 animate-spin ml-2" />}
@@ -102,7 +102,7 @@ export const HistoryToolbar: React.FC<HistoryToolbarProps> = ({
                         className={`
                             h-10 px-3 flex items-center gap-2 rounded-lg border transition-all text-sm font-medium whitespace-nowrap hover:shadow-lg active:scale-95
                             ${activeTabs.includes('IMPORT')
-                                ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' 
+                                ? 'bg-[#bf00ff]/10 border-[#bf00ff] text-[#bf00ff]' 
                                 : 'bg-slate-800 border-slate-600 text-gray-400 hover:text-white hover:border-gray-500'}
                         `}
                     >

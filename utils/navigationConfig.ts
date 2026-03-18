@@ -7,7 +7,8 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   RotateCcw, 
-  History 
+  History,
+  CalendarDays
 } from 'lucide-react';
 import { AppRouteConfig } from '../types';
 
@@ -19,6 +20,7 @@ const ImportManager = lazy(() => import('../components/Modules/Import/ImportMana
 const ExportManager = lazy(() => import('../components/Modules/Export/ExportManager').then(m => ({ default: m.ExportManager })));
 const ReImportManager = lazy(() => import('../components/Modules/ReImport/ReImportManager').then(m => ({ default: m.ReImportManager })));
 const HistoryManager = lazy(() => import('../components/Modules/History/HistoryManager').then(m => ({ default: m.HistoryManager })));
+const ExpectedSchedule = lazy(() => import('../components/Modules/ExpectedSchedule/ExpectedSchedule').then(m => ({ default: m.ExpectedSchedule })));
 
 export const APP_ROUTES: AppRouteConfig[] = [
   { 
@@ -72,6 +74,13 @@ export const APP_ROUTES: AppRouteConfig[] = [
     label: 'LỊCH SỬ', 
     icon: History, 
     component: HistoryManager,
+    isFullWidth: true 
+  },
+  { 
+    id: 'EXPECTED_SCHEDULE', 
+    label: 'LỊCH DỰ KIẾN', 
+    icon: CalendarDays, 
+    component: ExpectedSchedule,
     isFullWidth: true 
   },
 ];
