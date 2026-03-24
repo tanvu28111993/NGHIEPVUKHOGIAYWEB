@@ -45,7 +45,7 @@ export const useInventoryFilter = (inventory: InventoryItem[], initialState?: Pa
   useEffect(() => {
     try {
       // Use the centralized factory
-      workerRef.current = WorkerService.createWorker();
+      workerRef.current = WorkerService.createInventoryWorker();
       decoderRef.current = new TextDecoder();
 
       workerRef.current.onmessage = (e) => {

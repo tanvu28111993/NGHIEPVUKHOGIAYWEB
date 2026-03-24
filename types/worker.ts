@@ -19,16 +19,16 @@ export interface WorkerSortConfig {
 }
 
 // Discriminated Unions cho các hành động gửi ĐẾN Worker
-export type WorkerAction =
+export type WorkerAction<T = InventoryItem> =
   | { action: 'TRANSFORM'; rawData: any[][] }
-  | { action: 'MERGE_DATA'; currentData: InventoryItem[]; newItems: InventoryItem[] }
-  | { action: 'SET_DATA'; inventory: InventoryItem[] }
-  | { action: 'FILTER_SORT'; filterConfig: WorkerFilterConfig; sortConfig: WorkerSortConfig }
-  | { action: 'EXPORT_CSV'; columns: ColumnConfig<InventoryItem>[]; fileName: string };
+  | { action: 'MERGE_DATA'; currentData: T[]; newItems: T[] }
+  | { action: 'SET_DATA'; inventory?: T[]; data?: T[] }
+  | { action: 'FILTER_SORT'; filterConfig: any; sortConfig: any }
+  | { action: 'EXPORT_CSV'; columns: ColumnConfig<T>[]; fileName: string };
 
 // Discriminated Unions cho các kết quả trả về TỪ Worker
-export type WorkerResponse =
-  | { action: 'TRANSFORM_RESULT'; result?: InventoryItem[]; resultBuffer?: ArrayBuffer; error?: string }
-  | { action: 'MERGE_RESULT'; result?: InventoryItem[]; resultBuffer?: ArrayBuffer; error?: string }
-  | { action: 'FILTER_RESULT'; result?: InventoryItem[]; resultBuffer?: ArrayBuffer; totalWeight: number }
+export type WorkerResponse<T = InventoryItem> =
+  | { action: 'TRANSFORM_RESULT'; result?: T[]; resultBuffer?: ArrayBuffer; error?: string }
+  | { action: 'MERGE_RESULT'; result?: T[]; resultBuffer?: ArrayBuffer; error?: string }
+  | { action: 'FILTER_RESULT'; result?: T[]; resultBuffer?: ArrayBuffer; totalWeight: number }
   | { action: 'EXPORT_RESULT'; blob?: Blob; fileName: string; error?: string };

@@ -1,21 +1,35 @@
-import { InventoryItem, WorkerAction, WorkerResponse } from '../types';
+import { InventoryItem, ExpectedScheduleItem, WorkerAction, WorkerResponse } from '../types';
 import { WORKER_CODE } from '../workers/inventory.worker';
+import { EXPECTED_SCHEDULE_WORKER_CODE } from '../workers/expectedSchedule.worker';
 
-// Cache Blob URL để tránh tạo object URL liên tục gây leak memory
-let workerBlobUrl: string | null = null;
+// Cache Blob URLs để tránh tạo object URL liên tục gây leak memory
+let inventoryWorkerBlobUrl: string | null = null;
+let expectedScheduleWorkerBlobUrl: string | null = null;
 
 // --- FACTORY FOR WORKER CREATION ---
 // Allows creating new worker instances using the same code blob
-export const createWorker = (): Worker => {
+export const createInventoryWorker = (): Worker => {
   try {
-    if (!workerBlobUrl) {
+    if (!inventoryWorkerBlobUrl) {
         const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
-        workerBlobUrl = URL.createObjectURL(blob);
+        inventoryWorkerBlobUrl = URL.createObjectURL(blob);
     }
-    const worker = new Worker(workerBlobUrl);
-    return worker;
+    return new Worker(inventoryWorkerBlobUrl);
   } catch (e) {
-    console.error("Failed to create worker", e);
+    console.error("Failed to create inventory worker", e);
+    throw e;
+  }
+};
+
+export const createExpectedScheduleWorker = (): Worker => {
+  try {
+    if (!expectedScheduleWorkerBlobUrl) {
+        const blob = new Blob([EXPECTED_SCHEDULE_WORKER_CODE], { type: 'application/javascript' });
+        expectedScheduleWorkerBlobUrl = URL.createObjectURL(blob);
+    }
+    return new Worker(expectedScheduleWorkerBlobUrl);
+  } catch (e) {
+    console.error("Failed to create expected schedule worker", e);
     throw e;
   }
 };
@@ -25,7 +39,7 @@ let sharedWorker: Worker | null = null;
 
 const getSharedWorker = (): Worker => {
   if (!sharedWorker) {
-    sharedWorker = createWorker();
+    sharedWorker = createInventoryWorker();
     console.log("System: Singleton Transform Worker Initialized");
   }
   return sharedWorker;
@@ -48,7 +62,8 @@ const decodeWorkerResponse = (data: WorkerResponse) => {
 // --- ADAPTER / TRANSFORMER LOGIC ---
 // This acts as the Adapter Layer, transforming raw arrays to Typed Objects via Worker
 export const WorkerService = {
-  createWorker, // Export factory for other hooks (e.g. Filter)
+  createInventoryWorker, // Export factory for other hooks (e.g. Filter)
+  createExpectedScheduleWorker,
 
   transformData: (rawData: any[][]): Promise<InventoryItem[]> => {
     return new Promise((resolve, reject) => {
