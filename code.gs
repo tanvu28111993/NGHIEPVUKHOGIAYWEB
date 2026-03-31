@@ -577,12 +577,30 @@ function handleLogin(params) {
   
   if (!username || !password) return responseJSON({ success: false, message: "Thiếu thông tin" });
 
-  var ss = SpreadsheetApp.openById(ID_SHEET_DANG_NHAP);
-  var sheet = ss.getSheetByName("DN");
-  var lastRow = sheet.getLastRow();
-  if (lastRow < 2) return responseJSON({ success: false, message: "Lỗi hệ thống" });
-  
-  var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+  var cache = CacheService.getScriptCache();
+  var cacheKey = "USER_LIST_CACHE";
+  var cachedData = cache.get(cacheKey);
+  var data;
+
+  if (cachedData) {
+    try {
+      data = JSON.parse(cachedData);
+    } catch (e) {
+      data = null;
+    }
+  }
+
+  if (!data) {
+    var ss = SpreadsheetApp.openById(ID_SHEET_DANG_NHAP);
+    var sheet = ss.getSheetByName("DN");
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return responseJSON({ success: false, message: "Lỗi hệ thống" });
+    
+    data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+    // Cache for 6 hours (21600 seconds)
+    cache.put(cacheKey, JSON.stringify(data), 21600);
+  }
+
   for (var i = 0; i < data.length; i++) {
     if (String(data[i][0]) == username && String(data[i][1]) == password) {
       return responseJSON({ success: true, user: { username: username } });

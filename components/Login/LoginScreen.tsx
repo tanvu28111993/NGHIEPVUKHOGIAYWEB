@@ -20,20 +20,25 @@ export const LoginScreen: React.FC = () => {
   useEffect(() => {
     console.log("System: Starting data prefetch...");
 
-    // 1. Prefetch Inventory (Tồn kho)
-    queryClient.prefetchQuery({
-        queryKey: ['inventory'],
-        queryFn: () => fetchInventoryData(queryClient)
-    });
-
-    // 2. Prefetch Metadata (NCC, NSX, Loại giấy...)
-    // Sử dụng staleTime: 0 để ép buộc tải mới từ Google Sheet mỗi khi vào màn hình Login
-    // Điều này đảm bảo dữ liệu danh mục luôn mới nhất khi bắt đầu phiên làm việc
+    // 1. Prefetch Metadata (NCC, NSX, Loại giấy...)
+    // Metadata is small, fetch it immediately
     queryClient.prefetchQuery({
         queryKey: ['metadata'],
         queryFn: () => InventoryService.fetchMetaData(),
         staleTime: 0 
     });
+
+    // 2. Prefetch Inventory (Tồn kho)
+    // Delay inventory prefetch by 1.5s to avoid competing with initial login or metadata fetch
+    const timer = setTimeout(() => {
+        console.log("System: Starting inventory prefetch after delay...");
+        queryClient.prefetchQuery({
+            queryKey: ['inventory'],
+            queryFn: () => fetchInventoryData(queryClient)
+        });
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
