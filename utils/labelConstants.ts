@@ -10,7 +10,7 @@ export const PAPER_SIZES = {
 
 // Removed: lastUpdated, importer, pendingOut, custom_text
 export const AVAILABLE_FIELDS: { key: keyof InventoryItem | 'qr_1' | 'qr_2'; label: string; example: string }[] = [
-  { key: 'sku', label: 'Mã SKU', example: 'TB01A_G300_121224_0001' },
+  { key: 'sku', label: 'Mã SKU', example: 'TB01A_G300_121224_4508150426_123' },
   { key: 'qr_1', label: 'QR Code 1', example: '[QR]' },
   { key: 'qr_2', label: 'QR Code 2', example: '[QR]' },
   { key: 'packetCode', label: 'Mã kiện', example: 'K001' },

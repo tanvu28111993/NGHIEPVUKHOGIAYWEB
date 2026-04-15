@@ -23,13 +23,12 @@ export const useImportManager = () => {
   }, [inventory]);
 
   // Helper tạo mã SKU theo định dạng
-  // Format: TB[MãMụcĐích][MãKiện]_[Gsm]_[NgàyDDMMYY]_[Suffix4Digits]
+  // Format: TB[MãMụcĐích][MãKiện]_[Gsm]_[NgàyDDMMYY]_[MMHHDDMMYY_XXX]
   const generateSKU = (
       purposeCode: string, 
       packetCode: string, 
       gsm: string, 
-      importDate: string,
-      sequenceNumber: number
+      importDate: string
   ) => {
       const prefix = `TB${purposeCode}${packetCode}`;
       
@@ -44,7 +43,15 @@ export const useImportManager = () => {
           }
       }
 
-      const suffix = sequenceNumber.toString().padStart(4, '0');
+      const now = new Date();
+      const min = now.getMinutes().toString().padStart(2, '0');
+      const hr = now.getHours().toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const year = now.getFullYear().toString().slice(-2);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+      const suffix = `${min}${hr}${day}${month}${year}_${random}`;
       return `${prefix}_${gsm}_${dateCode}_${suffix}`;
   };
 
@@ -55,15 +62,20 @@ export const useImportManager = () => {
       codes: { purposeCode: string; packetCode: string }
   ) => {
     const newItems: InventoryItem[] = [];
+    const generatedSkus = new Set<string>();
     
     for (let i = 0; i < copies; i++) {
-        const newSku = generateSKU(
-            codes.purposeCode, 
-            codes.packetCode, 
-            itemData.gsm, 
-            itemData.importDate, 
-            i + 1
-        );
+        let newSku = "";
+        do {
+            newSku = generateSKU(
+                codes.purposeCode, 
+                codes.packetCode, 
+                itemData.gsm, 
+                itemData.importDate
+            );
+        } while (generatedSkus.has(newSku) || existingSkus.has(newSku));
+        
+        generatedSkus.add(newSku);
         
         newItems.push({
             ...itemData,
@@ -74,7 +86,7 @@ export const useImportManager = () => {
 
     setPendingImports(prev => [...newItems, ...prev]);
     addToast(`Đã thêm ${copies} dòng vào bảng tạm`, "info");
-  }, [addToast, setPendingImports]);
+  }, [addToast, setPendingImports, existingSkus]);
 
   // Xóa khỏi bảng tạm
   const removeItem = useCallback((index: number) => {
